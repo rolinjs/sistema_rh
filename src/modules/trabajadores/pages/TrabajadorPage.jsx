@@ -31,6 +31,32 @@ function TrabajadorPage() {
 
 
     // =====================================================
+    // DATOS DE CONTACTO
+    // =====================================================
+
+    const [direccion, setDireccion] = useState('')
+
+    const [correo, setCorreo] = useState('')
+
+    const [telefono, setTelefono] = useState('')
+
+    const [telefonoOpcional, setTelefonoOpcional] = useState('')
+
+
+    // =====================================================
+    // CONTACTO DE EMERGENCIA
+    // =====================================================
+
+    const [contactoEmergencia, setContactoEmergencia] = useState('')
+
+    const [parentescoEmergencia, setParentescoEmergencia] = useState('')
+
+    const [telefonoEmergencia, setTelefonoEmergencia] = useState('')
+
+    const [telefonoEmergenciaOpcional, setTelefonoEmergenciaOpcional] = useState('')
+
+
+    // =====================================================
     // FOTOGRAFÍA
     // =====================================================
 
@@ -270,6 +296,12 @@ function TrabajadorPage() {
 
             setApellidoMaterno(
                 persona.apellido_materno || ''
+            )
+
+            setDireccion(
+                persona.direccion_completa ||
+                persona.direccion ||
+                ''
             )
 
 
@@ -569,6 +601,22 @@ function TrabajadorPage() {
 
             sexo,
 
+            direccion,
+
+            correo,
+
+            telefono,
+
+            telefonoOpcional,
+
+            contactoEmergencia,
+
+            parentescoEmergencia,
+
+            telefonoEmergencia,
+
+            telefonoEmergenciaOpcional,
+
             foto,
 
             area,
@@ -638,12 +686,12 @@ function TrabajadorPage() {
 
         <>
 
-            <label>
+            <label className="w3-text-grey" style={{ fontSize: '12px', fontWeight: 600 }}>
                 {label}
             </label>
 
             <select
-                className="w3-select w3-border"
+                className="w3-select w3-border w3-round-small"
                 value={value}
                 onChange={onChange}
             >
@@ -671,6 +719,41 @@ function TrabajadorPage() {
 
 
     // =====================================================
+    // NOMBRE COMPLETO (solo presentación, derivado de los
+    // datos ya existentes obtenidos por consultarDni)
+    // =====================================================
+
+    const nombreCompletoApi = [
+        apellidoPaterno,
+        apellidoMaterno,
+        nombres
+    ]
+        .filter(Boolean)
+        .join(' ')
+
+
+    // =====================================================
+    // ESTILOS REUTILIZABLES
+    // =====================================================
+
+    const estiloLabel = {
+        fontSize: '12px',
+        fontWeight: 600,
+        color: '#5a5a5a'
+    }
+
+    const estiloReadOnly = {
+        backgroundColor: '#f3f3f3'
+    }
+
+    const estiloCompacto = {
+        padding: '4px 8px',
+        fontSize: '12px',
+        height: 'auto'
+    }
+
+
+    // =====================================================
     // INTERFAZ
     // =====================================================
 
@@ -684,17 +767,6 @@ function TrabajadorPage() {
             ================================================= */}
 
             <div className="w3-margin-bottom">
-
-                <h4 className="w3-margin-top">
-
-                    <i className="fa fa-dashboard"></i>
-
-                    &nbsp;
-
-                    Panel de Recursos Humanos
-
-                </h4>
-
 
                 <h3
                     className="w3-text-dark-grey"
@@ -726,14 +798,14 @@ function TrabajadorPage() {
                 TARJETA
             ================================================= */}
 
-            <div className="w3-card w3-white w3-margin-bottom">
+            <div className="w3-card w3-white w3-margin-bottom w3-round-small">
 
 
                 {/* CABECERA TARJETA */}
 
-                <header className="w3-container w3-light-grey">
+                <header className="w3-container w3-light-grey w3-round-small" style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
 
-                    <h5 className="w3-margin">
+                    <h5 className="w3-margin" style={{ margin: '10px 0' }}>
 
                         <i className="fa fa-plus-circle"></i>
 
@@ -759,7 +831,7 @@ function TrabajadorPage() {
                         DATOS PERSONALES
                     ================================================= */}
 
-                    <h4 className="w3-text-dark-grey">
+                    <h4 className="w3-text-dark-grey" style={{ marginBottom: '4px' }}>
 
                         <i className="fa fa-user"></i>
 
@@ -769,9 +841,13 @@ function TrabajadorPage() {
 
                     </h4>
 
+                    <hr style={{ margin: '4px 0 14px 0' }} />
+
 
                     {/* ---------------------------------------------
-                        DNI + NOMBRES
+                        FILA 1 (compacta): DNI · Nombres API · Apellido paterno
+                        · Apellido materno · Nombre — todos agrupados y
+                        reducidos de tamaño
                     --------------------------------------------- */}
 
                     <div className="w3-row-padding">
@@ -779,43 +855,39 @@ function TrabajadorPage() {
 
                         {/* DNI */}
 
-                        <div className="w3-col l3 m6 s12">
+                        <div className="w3-col l2 m4 s6 w3-margin-bottom">
 
-                            <label>
-                                DNI
-                            </label>
-
+                            <label style={estiloLabel}>DNI</label>
 
                             <div
                                 style={{
                                     display: 'flex',
-                                    gap: '5px'
+                                    gap: '4px'
                                 }}
                             >
 
                                 <input
-                                    className="w3-input w3-border"
+                                    className="w3-input w3-border w3-round-small"
                                     type="text"
                                     value={dni}
                                     onChange={(event) =>
                                         setDni(
                                             event.target.value
-                                                .replace(
-                                                    /\D/g,
-                                                    ''
-                                                )
+                                                .replace(/\D/g, '')
                                         )
                                     }
-                                    placeholder="Ingrese DNI"
+                                    placeholder="DNI"
                                     maxLength="8"
+                                    style={estiloCompacto}
                                 />
-
 
                                 <button
                                     type="button"
-                                    className="w3-button w3-flat-midnight-blue"
+                                    className="w3-button w3-flat-midnight-blue w3-round-small"
                                     onClick={consultarDni}
                                     disabled={consultandoDni}
+                                    title="Consultar DNI"
+                                    style={{ flexShrink: 0, padding: '4px 8px' }}
                                 >
 
                                     {consultandoDni
@@ -834,78 +906,73 @@ function TrabajadorPage() {
                         </div>
 
 
+                        {/* NOMBRES COMPLETOS API (solo lectura, derivado) */}
 
-                        {/* NOMBRES */}
+                        <div className="w3-col l3 m4 s6 w3-margin-bottom">
 
-                        <div className="w3-col l9 m6 s12">
-
-                            <label>
-                                Nombres
-                            </label>
-
+                            <label style={estiloLabel}>Nombres completos (API)</label>
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="text"
-                                value={nombres}
+                                value={nombreCompletoApi}
                                 readOnly
                                 placeholder="Se obtiene mediante DNI"
-                                style={{
-                                    backgroundColor: '#f3f3f3'
-                                }}
+                                style={{ ...estiloReadOnly, ...estiloCompacto }}
                             />
 
                         </div>
 
-                    </div>
 
+                        {/* APELLIDO PATERNO */}
 
+                        <div className="w3-col l2 m4 s6 w3-margin-bottom">
 
-                    {/* ---------------------------------------------
-                        APELLIDOS
-                    --------------------------------------------- */}
-
-                    <div className="w3-row-padding w3-margin-top">
-
-
-                        <div className="w3-col l6 m6 s12">
-
-                            <label>
-                                Apellido paterno
-                            </label>
-
+                            <label style={estiloLabel}>Apellido paterno</label>
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="text"
                                 value={apellidoPaterno}
                                 readOnly
                                 placeholder="Se obtiene mediante DNI"
-                                style={{
-                                    backgroundColor: '#f3f3f3'
-                                }}
+                                style={{ ...estiloReadOnly, ...estiloCompacto }}
                             />
 
                         </div>
 
 
+                        {/* APELLIDO MATERNO */}
 
-                        <div className="w3-col l6 m6 s12">
+                        <div className="w3-col l2 m4 s6 w3-margin-bottom">
 
-                            <label>
-                                Apellido materno
-                            </label>
-
+                            <label style={estiloLabel}>Apellido materno</label>
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="text"
                                 value={apellidoMaterno}
                                 readOnly
                                 placeholder="Se obtiene mediante DNI"
-                                style={{
-                                    backgroundColor: '#f3f3f3'
-                                }}
+                                style={{ ...estiloReadOnly, ...estiloCompacto }}
+                            />
+
+                        </div>
+
+
+                        {/* NOMBRE (nombres) */}
+
+                        <div className="w3-col l3 m4 s6 w3-margin-bottom">
+
+                            <label style={estiloLabel}>Nombre</label>
+
+                            <input
+                                className="w3-input w3-border w3-round-small"
+                                type="text"
+                                value={nombres}
+                                readOnly
+                                placeholder="Se obtiene mediante DNI"
+                                style={{ ...estiloReadOnly, ...estiloCompacto }}
                             />
 
                         </div>
@@ -913,23 +980,21 @@ function TrabajadorPage() {
                     </div>
 
 
-
                     {/* ---------------------------------------------
-                        FECHA + SEXO
+                        FILA 2: Fecha de nacimiento · Sexo · Correo · Dirección
                     --------------------------------------------- */}
 
-                    <div className="w3-row-padding w3-margin-top">
+                    <div className="w3-row-padding">
 
 
-                        <div className="w3-col l3 m6 s12">
+                        {/* FECHA DE NACIMIENTO */}
 
-                            <label>
-                                Fecha de nacimiento
-                            </label>
+                        <div className="w3-col l2 m6 s12 w3-margin-bottom">
 
+                            <label style={estiloLabel}>Fecha de nacimiento</label>
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="date"
                                 value={fechaNacimiento}
                                 onChange={(event) =>
@@ -942,16 +1007,14 @@ function TrabajadorPage() {
                         </div>
 
 
+                        {/* SEXO */}
 
-                        <div className="w3-col l3 m6 s12">
+                        <div className="w3-col l2 m6 s12 w3-margin-bottom">
 
-                            <label>
-                                Sexo
-                            </label>
-
+                            <label style={estiloLabel}>Sexo</label>
 
                             <select
-                                className="w3-select w3-border"
+                                className="w3-select w3-border w3-round-small"
                                 value={sexo}
                                 onChange={(event) =>
                                     setSexo(
@@ -976,8 +1039,72 @@ function TrabajadorPage() {
 
                         </div>
 
-                    </div>
 
+                        {/* CORREO */}
+
+                        <div className="w3-col l3 m6 s12 w3-margin-bottom">
+
+                            <label style={estiloLabel}>Correo electrónico</label>
+
+                            <input
+                                className="w3-input w3-border w3-round-small"
+                                type="email"
+                                value={correo}
+                                onChange={(event) =>
+                                    setCorreo(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="correo@empresa.com"
+                            />
+
+                        </div>
+
+
+                        {/* DIRECCIÓN */}
+
+                        <div className="w3-col l3 m6 s12 w3-margin-bottom">
+
+                            <label style={estiloLabel}>Dirección</label>
+
+                            <input
+                                className="w3-input w3-border w3-round-small"
+                                type="text"
+                                value={direccion}
+                                onChange={(event) =>
+                                    setDireccion(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Ingrese dirección"
+                            />
+
+                        </div>
+
+                        {/* TELÉFONO */}
+
+                        <div className="w3-col l2 m6 s12 w3-margin-bottom">
+
+                            <label style={estiloLabel}>Teléfono</label>
+
+                            <input
+                                className="w3-input w3-border w3-round-small"
+                                type="tel"
+                                value={telefono}
+                                onChange={(event) =>
+                                    setTelefono(
+                                        event.target.value
+                                            .replace(/\D/g, '')
+                                    )
+                                }
+                                placeholder="999999999"
+                                maxLength="9"
+                            />
+
+                        </div>
+
+
+                    </div>
 
 
                     {/* =================================================
@@ -986,192 +1113,271 @@ function TrabajadorPage() {
 
                     <div className="w3-margin-top">
 
+                        <h5 className="w3-text-dark-grey" style={{ marginBottom: '4px' }}>
 
-                        <label>
-                            <b>
-                                Fotografía del trabajador
-                            </b>
-                        </label>
+                            <i className="fa fa-camera"></i>
+
+                            &nbsp;
+
+                            Fotografía del trabajador
+
+                        </h5>
+
+                        <hr style={{ margin: '4px 0 14px 0' }} />
 
 
                         <div
-                            className="w3-border"
+                            className="w3-card w3-round-small"
                             style={{
-                                width: '220px',
-                                height: '220px',
-                                marginTop: '8px',
-                                overflow: 'hidden',
-                                backgroundColor: '#f5f5f5',
-                                position: 'relative'
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: '16px',
+                                padding: '16px',
+                                alignItems: 'flex-start'
                             }}
                         >
 
-                            {/* VIDEO */}
+                            {/* IZQUIERDA: RECUADRO 220x220 */}
 
-                            <video
-                                ref={videoRef}
-                                autoPlay
-                                playsInline
-                                muted
+                            <div
+                                className="w3-border"
                                 style={{
-                                    display:
-                                        camaraActiva
-                                            ? 'block'
-                                            : 'none',
-
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
+                                    width: '220px',
+                                    height: '220px',
+                                    overflow: 'hidden',
+                                    backgroundColor: '#f5f5f5',
+                                    position: 'relative',
+                                    flexShrink: 0,
+                                    borderRadius: '6px'
                                 }}
-                            />
+                            >
 
+                                {/* VIDEO */}
 
-                            {/* FOTO */}
-
-                            {!camaraActiva && foto && (
-
-                                <img
-                                    src={foto}
-                                    alt="Fotografía del trabajador"
+                                <video
+                                    ref={videoRef}
+                                    autoPlay
+                                    playsInline
+                                    muted
                                     style={{
+                                        display:
+                                            camaraActiva
+                                                ? 'block'
+                                                : 'none',
+
                                         width: '100%',
                                         height: '100%',
                                         objectFit: 'cover'
                                     }}
                                 />
 
-                            )}
 
+                                {/* FOTO */}
 
-                            {/* SIN FOTO */}
+                                {!camaraActiva && foto && (
 
-                            {!camaraActiva && !foto && (
-
-                                <div
-                                    className="w3-center w3-text-grey"
-                                    style={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform:
-                                            'translate(-50%, -50%)',
-                                        width: '100%'
-                                    }}
-                                >
-
-                                    <i
-                                        className="fa fa-camera"
+                                    <img
+                                        src={foto}
+                                        alt="Fotografía del trabajador"
                                         style={{
-                                            fontSize: '45px'
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover'
                                         }}
-                                    ></i>
+                                    />
+
+                                )}
 
 
-                                    <p>
-                                        Sin fotografía
-                                    </p>
+                                {/* SIN FOTO */}
 
-                                </div>
+                                {!camaraActiva && !foto && (
 
-                            )}
+                                    <div
+                                        className="w3-center w3-text-grey"
+                                        style={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            left: '50%',
+                                            transform:
+                                                'translate(-50%, -50%)',
+                                            width: '100%'
+                                        }}
+                                    >
 
-                        </div>
-
-
-
-                        {/* BOTONES */}
-
-                        {!camaraActiva && !foto && (
-
-                            <button
-                                type="button"
-                                className="w3-button w3-light-grey w3-margin-top"
-                                onClick={abrirCamara}
-                            >
-
-                                <i className="fa fa-camera"></i>
-
-                                &nbsp;
-
-                                Tomar foto
-
-                            </button>
-
-                        )}
+                                        <i
+                                            className="fa fa-user-circle"
+                                            style={{
+                                                fontSize: '60px'
+                                            }}
+                                        ></i>
 
 
+                                        <p style={{ margin: '6px 0 0 0', fontSize: '12px' }}>
+                                            Sin fotografía
+                                        </p>
 
-                        {camaraActiva && (
+                                    </div>
 
-                            <div
-                                className="w3-margin-top"
-                                style={{
-                                    display: 'flex',
-                                    gap: '8px'
-                                }}
-                            >
-
-                                <button
-                                    type="button"
-                                    className="w3-button w3-flat-midnight-blue"
-                                    onClick={capturarFoto}
-                                >
-
-                                    <i className="fa fa-camera"></i>
-
-                                    &nbsp;
-
-                                    Capturar
-
-                                </button>
+                                )}
 
 
-                                <button
-                                    type="button"
-                                    className="w3-button w3-light-grey"
-                                    onClick={cerrarCamara}
-                                >
-
-                                    <i className="fa fa-times"></i>
-
-                                    &nbsp;
-
-                                    Cancelar
-
-                                </button>
+                                <canvas
+                                    ref={canvasRef}
+                                    style={{
+                                        display: 'none'
+                                    }}
+                                />
 
                             </div>
 
-                        )}
+
+                            {/* DERECHA: INDICACIONES + BOTONES */}
+
+                            <div style={{ flex: '1', minWidth: '240px' }}>
+
+                                <div
+                                    className="w3-panel w3-pale-blue w3-leftbar w3-border-blue"
+                                    style={{
+                                        margin: 0,
+                                        padding: '10px 14px',
+                                        fontSize: '12px'
+                                    }}
+                                >
+
+                                    <p style={{ margin: '0 0 6px 0', fontWeight: 600 }}>
+
+                                        <i className="fa fa-info-circle"></i>
+
+                                        &nbsp;
+
+                                        Indicaciones
+
+                                    </p>
+
+                                    <ul style={{ margin: 0, paddingLeft: '18px' }}>
+
+                                        <li>Tome una foto clara del rostro.</li>
+
+                                        <li>Fondo neutro y buena iluminación.</li>
+
+                                        <li>La fotografía será utilizada para el control de asistencia.</li>
+
+                                    </ul>
+
+                                </div>
 
 
+                                {/* BOTONES DE ACCIÓN */}
 
-                        {foto && !camaraActiva && (
+                                <div
+                                    className="w3-margin-top"
+                                    style={{
+                                        display: 'flex',
+                                        flexWrap: 'wrap',
+                                        gap: '8px'
+                                    }}
+                                >
 
-                            <button
-                                type="button"
-                                className="w3-button w3-light-grey w3-margin-top"
-                                onClick={tomarOtraFoto}
-                            >
+                                    {!camaraActiva && (
 
-                                <i className="fa fa-camera"></i>
+                                        <button
+                                            type="button"
+                                            className="w3-button w3-flat-midnight-blue w3-round-small w3-small"
+                                            onClick={foto ? tomarOtraFoto : abrirCamara}
+                                        >
 
-                                &nbsp;
+                                            <i className="fa fa-camera"></i>
 
-                                Tomar otra foto
+                                            &nbsp;
 
-                            </button>
+                                            {foto ? 'Tomar otra foto' : 'Tomar foto'}
 
-                        )}
+                                        </button>
+
+                                    )}
 
 
+                                    {camaraActiva && (
 
-                        <canvas
-                            ref={canvasRef}
-                            style={{
-                                display: 'none'
-                            }}
-                        />
+                                        <>
+
+                                            <button
+                                                type="button"
+                                                className="w3-button w3-flat-midnight-blue w3-round-small w3-small"
+                                                onClick={capturarFoto}
+                                            >
+
+                                                <i className="fa fa-camera"></i>
+
+                                                &nbsp;
+
+                                                Capturar
+
+                                            </button>
+
+
+                                            <button
+                                                type="button"
+                                                className="w3-button w3-light-grey w3-round-small w3-small"
+                                                onClick={cerrarCamara}
+                                            >
+
+                                                <i className="fa fa-times"></i>
+
+                                                &nbsp;
+
+                                                Cancelar
+
+                                            </button>
+
+                                        </>
+
+                                    )}
+
+
+                                    {/* SUBIR FOTO — visual, sin lógica de carga de archivo aún */}
+
+                                    <button
+                                        type="button"
+                                        className="w3-button w3-light-grey w3-round-small w3-small"
+                                        title="Funcionalidad de carga de archivo no implementada"
+                                    >
+
+                                        <i className="fa fa-upload"></i>
+
+                                        &nbsp;
+
+                                        Subir foto
+
+                                    </button>
+
+
+                                    {/* ELIMINAR — reutiliza el estado existente de foto */}
+
+                                    {foto && !camaraActiva && (
+
+                                        <button
+                                            type="button"
+                                            className="w3-button w3-red w3-round-small w3-small"
+                                            onClick={() => setFoto(null)}
+                                        >
+
+                                            <i className="fa fa-trash"></i>
+
+                                            &nbsp;
+
+                                            Eliminar
+
+                                        </button>
+
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -1325,13 +1531,13 @@ function TrabajadorPage() {
 
                         <div className="w3-col l3 m6 s12">
 
-                            <label>
+                            <label style={estiloLabel}>
                                 Fecha de ingreso
                             </label>
 
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="date"
                                 value={fechaIngreso}
                                 onChange={(event) =>
@@ -1351,13 +1557,13 @@ function TrabajadorPage() {
 
                         <div className="w3-col l3 m6 s12">
 
-                            <label>
+                            <label style={estiloLabel}>
                                 Fecha de cese
                             </label>
 
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="date"
                                 value={fechaCese}
                                 onChange={(event) =>
@@ -1431,13 +1637,13 @@ function TrabajadorPage() {
 
                         <div className="w3-col l4 m6 s12">
 
-                            <label>
+                            <label style={estiloLabel}>
                                 Número de cuenta / CCI
                             </label>
 
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="text"
                                 value={cuentaCci}
                                 onChange={(event) =>
@@ -1511,13 +1717,13 @@ function TrabajadorPage() {
 
                         <div className="w3-col l4 m6 s12">
 
-                            <label>
+                            <label style={estiloLabel}>
                                 CUSPP
                             </label>
 
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="text"
                                 value={cuspp}
                                 onChange={(event) =>
@@ -1557,13 +1763,13 @@ function TrabajadorPage() {
 
                         <div className="w3-col l3 m6 s12">
 
-                            <label>
+                            <label style={estiloLabel}>
                                 Número de hijos
                             </label>
 
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="number"
                                 min="0"
                                 value={hijos}
@@ -1580,13 +1786,13 @@ function TrabajadorPage() {
 
                         <div className="w3-col l3 m6 s12">
 
-                            <label>
+                            <label style={estiloLabel}>
                                 Asignación familiar
                             </label>
 
 
                             <select
-                                className="w3-select w3-border"
+                                className="w3-select w3-border w3-round-small"
                                 value={asignacionFamiliar}
                                 onChange={(event) =>
                                     setAsignacionFamiliar(
@@ -1615,13 +1821,13 @@ function TrabajadorPage() {
 
                         <div className="w3-col l3 m6 s12">
 
-                            <label>
+                            <label style={estiloLabel}>
                                 Fecha de asignación
                             </label>
 
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="date"
                                 value={fechaAsignacion}
                                 onChange={(event) =>
@@ -1637,13 +1843,13 @@ function TrabajadorPage() {
 
                         <div className="w3-col l3 m6 s12">
 
-                            <label>
+                            <label style={estiloLabel}>
                                 Monto
                             </label>
 
 
                             <input
-                                className="w3-input w3-border"
+                                className="w3-input w3-border w3-round-small"
                                 type="number"
                                 step="0.01"
                                 value={montoAsignacion}
@@ -1668,7 +1874,7 @@ function TrabajadorPage() {
 
                         <button
                             type="submit"
-                            className="w3-button w3-flat-midnight-blue"
+                            className="w3-button w3-flat-midnight-blue w3-round-small"
                         >
 
                             <i className="fa fa-save"></i>

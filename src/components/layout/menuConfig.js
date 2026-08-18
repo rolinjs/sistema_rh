@@ -62,6 +62,13 @@ const menuConfig = [
                 label: 'Periodos de pago',
                 icon: 'fa-calendar-check-o',
                 path: '/periodos-pago'
+            },
+
+            {
+                id: 'regimenes-laborales',
+                label: 'Regímenes laborales',
+                icon: 'fa-legal',
+                path: '/regimenes-laborales'
             }
 
         ]
@@ -174,6 +181,13 @@ const menuConfig = [
                 label: 'Periodos',
                 icon: 'fa-calendar',
                 path: '/remuneraciones/periodos'
+            },
+
+            {
+                id: 'configuracion-regimen',
+                label: 'Configuración de regímenes',
+                icon: 'fa-sliders',
+                path: '/remuneraciones/configuracion-regimen'
             },
 
             {
