@@ -5,7 +5,6 @@ function PageContent({ children }) {
         <div
             className="w3-main"
             style={{
-                marginLeft: '300px',
                 marginTop: '43px'
             }}
         >

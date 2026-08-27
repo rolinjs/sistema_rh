@@ -7,33 +7,66 @@ import AppRoutes from '../../routes/AppRoutes'
 function MainLayout() {
 
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+
+    // =====================================================
+    // ABRIR / CERRAR SIDEBAR
+    // =====================================================
 
     const toggleSidebar = () => {
         setSidebarOpen(prev => !prev)
     }
 
+
+    // =====================================================
+    // CERRAR SIDEBAR EN MÓVIL
+    // =====================================================
+
     const closeSidebar = () => {
         setSidebarOpen(false)
     }
 
+
+    // =====================================================
+    // COLAPSAR / EXPANDIR SIDEBAR
+    // =====================================================
+
+    const toggleSidebarCollapsed = () => {
+        setSidebarCollapsed(prev => !prev)
+    }
+
+
     return (
         <>
 
-            {/* Top container */}
+            {/* =================================================
+                NAVBAR
+            ================================================= */}
+
             <Navbar
                 onToggleSidebar={toggleSidebar}
             />
 
 
-            {/* Sidebar / Menu */}
+            {/* =================================================
+                SIDEBAR
+            ================================================= */}
+
             <Sidebar
                 isOpen={sidebarOpen}
                 onClose={closeSidebar}
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={toggleSidebarCollapsed}
             />
 
 
-            {/* Overlay */}
+            {/* =================================================
+                OVERLAY PARA MÓVIL
+            ================================================= */}
+
             {sidebarOpen && (
+
                 <div
                     className="w3-overlay w3-hide-large w3-animate-opacity"
                     onClick={closeSidebar}
@@ -43,12 +76,29 @@ function MainLayout() {
                     title="close side menu"
                     id="myOverlay"
                 ></div>
+
             )}
 
 
-            <PageContent>
-                <AppRoutes />
-            </PageContent>
+            {/* =================================================
+                CONTENIDO PRINCIPAL
+            ================================================= */}
+
+            <div
+                className="main-content"
+                style={{
+                    marginLeft: sidebarCollapsed
+                        ? '70px'
+                        : '300px',
+                    transition: 'margin-left 0.3s ease'
+                }}
+            >
+
+                <PageContent>
+                    <AppRoutes />
+                </PageContent>
+
+            </div>
 
         </>
     )

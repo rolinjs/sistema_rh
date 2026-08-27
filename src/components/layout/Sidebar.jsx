@@ -5,7 +5,12 @@ import foto from '../../assets/logo_koricancha.png'
 import menuConfig from './menuConfig'
 
 
-function Sidebar({ isOpen, onClose }) {
+function Sidebar({
+    isOpen,
+    onClose,
+    isCollapsed,
+    onToggleCollapse
+}) {
 
     const [openMenus, setOpenMenus] = useState({})
 
@@ -32,7 +37,7 @@ function Sidebar({ isOpen, onClose }) {
 
         return `w3-bar-item w3-button w3-padding ${
             isActive
-                ? 'w3-light-grey'
+                ? 'w3-green'
                 : ''
         }`
 
@@ -49,7 +54,11 @@ function Sidebar({ isOpen, onClose }) {
             }`}
             style={{
                 zIndex: 3,
-                width: '300px'
+                width: isCollapsed
+                    ? '70px'
+                    : '300px',
+                transition: 'width 0.3s ease',
+                overflowX: 'hidden'
             }}
             id="mySidebar"
         >
@@ -63,7 +72,17 @@ function Sidebar({ isOpen, onClose }) {
 
             <div className="w3-container w3-row">
 
-                <div className="w3-col s4">
+                <div
+                    className="w3-col s4"
+                    style={{
+                        width: isCollapsed
+                            ? '100%'
+                            : '33.33333%',
+                        textAlign: isCollapsed
+                            ? 'center'
+                            : 'left'
+                    }}
+                >
 
                     <img
                         src={foto}
@@ -77,39 +96,43 @@ function Sidebar({ isOpen, onClose }) {
                 </div>
 
 
-                <div className="w3-col s8 w3-bar">
+                {!isCollapsed && (
 
-                    <span>
-                        Bienvenido, <strong>Usuario</strong>
-                    </span>
+                    <div className="w3-col s8 w3-bar">
 
-                    <br />
+                        <span>
+                            Bienvenido, <strong>Usuario</strong>
+                        </span>
 
-
-                    <a
-                        href="#"
-                        className="w3-bar-item w3-button"
-                    >
-                        <i className="fa fa-envelope"></i>
-                    </a>
+                        <br />
 
 
-                    <a
-                        href="#"
-                        className="w3-bar-item w3-button"
-                    >
-                        <i className="fa fa-user"></i>
-                    </a>
+                        <a
+                            href="#"
+                            className="w3-bar-item w3-button"
+                        >
+                            <i className="fa fa-envelope"></i>
+                        </a>
 
 
-                    <a
-                        href="#"
-                        className="w3-bar-item w3-button"
-                    >
-                        <i className="fa fa-cog"></i>
-                    </a>
+                        <a
+                            href="#"
+                            className="w3-bar-item w3-button"
+                        >
+                            <i className="fa fa-user"></i>
+                        </a>
 
-                </div>
+
+                        <a
+                            href="#"
+                            className="w3-bar-item w3-button"
+                        >
+                            <i className="fa fa-cog"></i>
+                        </a>
+
+                    </div>
+
+                )}
 
             </div>
 
@@ -118,16 +141,57 @@ function Sidebar({ isOpen, onClose }) {
 
 
             {/* =================================================
+                BOTÓN COLAPSAR / EXPANDIR
+            ================================================= */}
+
+            <div
+                className="w3-container"
+                style={{
+                    textAlign: isCollapsed
+                        ? 'center'
+                        : 'right'
+                }}
+            >
+
+                <button
+                    type="button"
+                    className="w3-button w3-light-grey"
+                    onClick={onToggleCollapse}
+                    title={
+                        isCollapsed
+                            ? 'Expandir menú'
+                            : 'Colapsar menú'
+                    }
+                >
+
+                    <i
+                        className={`fa ${
+                            isCollapsed
+                                ? 'fa-chevron-right'
+                                : 'fa-chevron-left'
+                        }`}
+                    ></i>
+
+                </button>
+
+            </div>
+
+
+            {/* =================================================
                 PANEL
             ================================================= */}
 
-            <div className="w3-container">
+            {!isCollapsed && (
 
-                <h5>
-                    Panel
-                </h5>
+                <div className="w3-container">
 
-            </div>
+                    <h5>
+                        Panel
+                    </h5>
+
+                </div>
+
+            )}
 
 
             <div className="w3-bar-block">
@@ -152,7 +216,7 @@ function Sidebar({ isOpen, onClose }) {
 
                     <i className="fa fa-remove fa-fw"></i>
 
-                    Cerrar menú
+                    {!isCollapsed && 'Cerrar menú'}
 
                 </a>
 
@@ -176,13 +240,24 @@ function Sidebar({ isOpen, onClose }) {
                                 key={menu.id}
                                 to={menu.path}
                                 className={getLinkClass}
+                                title={
+                                    isCollapsed
+                                        ? menu.label
+                                        : ''
+                                }
+                                style={{
+                                    textAlign: isCollapsed
+                                        ? 'center'
+                                        : 'left',
+                                    whiteSpace: 'nowrap'
+                                }}
                             >
 
                                 <i
                                     className={`fa ${menu.icon} fa-fw`}
                                 ></i>
 
-                                {menu.label}
+                                {!isCollapsed && menu.label}
 
                             </NavLink>
 
@@ -210,12 +285,22 @@ function Sidebar({ isOpen, onClose }) {
                                 type="button"
                                 className="w3-bar-item w3-button w3-padding rrhh-menu"
                                 onClick={() => {
+
                                     toggleMenu(menu.id)
+
                                 }}
+                                title={
+                                    isCollapsed
+                                        ? menu.label
+                                        : ''
+                                }
                                 style={{
                                     width: '100%',
-                                    textAlign: 'left',
-                                    border: 'none'
+                                    textAlign: isCollapsed
+                                        ? 'center'
+                                        : 'left',
+                                    border: 'none',
+                                    whiteSpace: 'nowrap'
                                 }}
                             >
 
@@ -223,49 +308,57 @@ function Sidebar({ isOpen, onClose }) {
                                     className={`fa ${menu.icon} fa-fw`}
                                 ></i>
 
-                                {menu.label}
+                                {!isCollapsed && menu.label}
 
 
-                                <i
-                                    className={`fa w3-right menu-arrow ${
-                                        isOpenMenu
-                                            ? 'fa-chevron-up'
-                                            : 'fa-chevron-down'
-                                    }`}
-                                ></i>
+                                {!isCollapsed && (
+
+                                    <i
+                                        className={`fa w3-right menu-arrow ${
+                                            isOpenMenu
+                                                ? 'fa-chevron-up'
+                                                : 'fa-chevron-down'
+                                        }`}
+                                    ></i>
+
+                                )}
 
                             </button>
 
 
                             {/* SUBMENÚ */}
 
-                            <div
-                                className={`rrhh-submenu ${
-                                    isOpenMenu
-                                        ? 'w3-show'
-                                        : 'w3-hide'
-                                }`}
-                            >
+                            {!isCollapsed && (
 
-                                {menu.children.map(child => (
+                                <div
+                                    className={`rrhh-submenu ${
+                                        isOpenMenu
+                                            ? 'w3-show'
+                                            : 'w3-hide'
+                                    }`}
+                                >
 
-                                    <NavLink
-                                        key={child.id}
-                                        to={child.path}
-                                        className={getLinkClass}
-                                    >
+                                    {menu.children.map(child => (
 
-                                        <i
-                                            className={`fa ${child.icon} fa-fw`}
-                                        ></i>
+                                        <NavLink
+                                            key={child.id}
+                                            to={child.path}
+                                            className={getLinkClass}
+                                        >
 
-                                        {child.label}
+                                            <i
+                                                className={`fa ${child.icon} fa-fw`}
+                                            ></i>
 
-                                    </NavLink>
+                                            {child.label}
 
-                                ))}
+                                        </NavLink>
 
-                            </div>
+                                    ))}
+
+                                </div>
+
+                            )}
 
                         </div>
 

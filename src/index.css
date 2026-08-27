@@ -24,3 +24,34 @@ h5 {
 .menu-arrow {
     transition: transform 0.2s ease;
 }
+
+.server-offline {
+    animation: servidorParpadeando 1s infinite;
+}
+
+@keyframes servidorParpadeando {
+
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.25;
+    }
+
+    100% {
+        opacity: 1;
+    }
+
+}
+.main-content {
+    width: auto;
+}
+
+@media (max-width: 992px) {
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+}
