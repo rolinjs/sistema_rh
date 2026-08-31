@@ -1,23 +1,21 @@
-const API_URL = 'http://localhost:8080/api/reniec'
+import apiClient from "../../../services/apiClient";
 
 
 export const consultarDni = async (dni) => {
 
-    const response = await fetch(
-        `${API_URL}/${dni}`
-    )
+    const response = await apiClient.get(
+        `/reniec/${dni}`
+    );
 
 
-    const resultado =
-        await response.json()
+    const resultado = response.data;
 
 
-    if (!response.ok) {
+    if (!response.data) {
 
         throw new Error(
-            resultado.message ||
-            'No se pudo consultar el DNI.'
-        )
+            "No se pudo obtener información del DNI."
+        );
 
     }
 
@@ -26,12 +24,12 @@ export const consultarDni = async (dni) => {
 
         throw new Error(
             resultado.message ||
-            'No se encontró información del DNI.'
-        )
+            "No se encontró información del DNI."
+        );
 
     }
 
 
-    return resultado.data
+    return resultado.data;
 
-}
+};
