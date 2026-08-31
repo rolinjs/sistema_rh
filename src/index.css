@@ -1,3 +1,4 @@
+
 html,
 body,
 h1,
@@ -5,7 +6,7 @@ h2,
 h3,
 h4,
 h5 {
-    font-family: "Raleway", sans-serif;
+    font-family: "Nunito Sans", sans-serif;
 }
 
 /* .rrhh-menu {
@@ -44,6 +45,7 @@ h5 {
     }
 
 }
+
 .main-content {
     width: auto;
 }
@@ -55,3 +57,17 @@ h5 {
     }
 
 }
+.trabajadores-tabla-compacta th,
+                        .trabajadores-tabla-compacta td {
+                            padding: 5px 7px;
+                            white-space: nowrap;
+                            vertical-align: middle;
+                        }
+
+                        .trabajadores-tabla-compacta th {
+                            font-size: 11px;
+                        }
+
+                        .trabajadores-tabla-compacta td {
+                            font-size: 11px;
+                        }

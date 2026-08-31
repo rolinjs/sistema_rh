@@ -37,10 +37,24 @@ const menuConfig = [
             },
 
             {
+                id: 'subareas',
+                label: 'SubÁreas',
+                icon: 'fa-sitemap',
+                path: '/subareas'
+            },
+
+            {
                 id: 'cargos',
                 label: 'Cargos',
                 icon: 'fa-briefcase',
                 path: '/cargos'
+            },
+
+            {
+                id: 'cargos-especificos',
+                label: 'Cargos específicos',
+                icon: 'fa-id-badge',
+                path: '/cargos-especificos'
             },
 
             {
@@ -111,6 +125,27 @@ const menuConfig = [
                 label: 'Movimientos',
                 icon: 'fa-exchange',
                 path: '/movimientos'
+            }
+
+        ]
+    },
+
+
+    // =====================================================
+    // CONTABILIDAD
+    // =====================================================
+
+    {
+        id: 'contabilidad',
+        label: 'Contabilidad',
+        icon: 'fa-calculator',
+        children: [
+
+            {
+                id: 'caja-chica',
+                label: 'Caja Chica',
+                icon: 'fa-money',
+                path: '/caja-chica'
             }
 
         ]
@@ -272,142 +307,139 @@ const menuConfig = [
 
 
     // =====================================================
-    // SECCIÓN ALMACÉN
+    // GESTIÓN DE ALMACÉN
     // =====================================================
 
-    // =====================================================
-// GESTIÓN DE ALMACÉN
-// =====================================================
+    {
+        id: 'gestion-almacen',
+        label: 'Gestión de Almacén',
+        icon: 'fa-archive',
+        children: [
 
-{
-    id: 'gestion-almacen',
-    label: 'Gestión de Almacén',
-    icon: 'fa-archive',
-    children: [
+            // =============================================
+            // MAESTROS
+            // =============================================
 
-        // =============================================
-        // MAESTROS
-        // =============================================
+            {
+                id: 'almacen-productos',
+                label: 'Productos / Materiales',
+                icon: 'fa-cube',
+                path: '/almacen/productos'
+            },
 
-        {
-            id: 'almacen-productos',
-            label: 'Productos / Materiales',
-            icon: 'fa-cube',
-            path: '/almacen/productos'
-        },
+            {
+                id: 'almacen-destinos',
+                label: 'Destinos / Mercados',
+                icon: 'fa-map-marker',
+                path: '/almacen/destinos'
+            },
 
-        {
-            id: 'almacen-destinos',
-            label: 'Destinos / Mercados',
-            icon: 'fa-map-marker',
-            path: '/almacen/destinos'
-        },
-
-        {
-            id: 'almacen-periodos',
-            label: 'Periodos / Semanas',
-            icon: 'fa-calendar',
-            path: '/almacen/periodos'
-        },
+            {
+                id: 'almacen-periodos',
+                label: 'Periodos / Semanas',
+                icon: 'fa-calendar',
+                path: '/almacen/periodos'
+            },
 
 
-        // =============================================
-        // MOVIMIENTOS
-        // =============================================
+            // =============================================
+            // MOVIMIENTOS
+            // =============================================
 
-        {
-            id: 'almacen-entradas',
-            label: 'Entradas',
-            icon: 'fa-sign-in',
-            path: '/almacen/entradas'
-        },
+            {
+                id: 'almacen-entradas',
+                label: 'Entradas',
+                icon: 'fa-sign-in',
+                path: '/almacen/entradas'
+            },
 
-        {
-            id: 'almacen-salidas',
-            label: 'Salidas',
-            icon: 'fa-sign-out',
-            path: '/almacen/salidas'
-        },
+            {
+                id: 'almacen-salidas',
+                label: 'Salidas',
+                icon: 'fa-sign-out',
+                path: '/almacen/salidas'
+            },
 
-        {
-            id: 'almacen-movimientos',
-            label: 'Movimientos',
-            icon: 'fa-exchange',
-            path: '/almacen/movimientos'
-        },
-
-
-        // =============================================
-        // KARDEX
-        // =============================================
-
-        {
-            id: 'almacen-kardex',
-            label: 'Kardex',
-            icon: 'fa-list-alt',
-            path: '/almacen/kardex'
-        },
+            {
+                id: 'almacen-movimientos',
+                label: 'Movimientos',
+                icon: 'fa-exchange',
+                path: '/almacen/movimientos'
+            },
 
 
-        // =============================================
-        // INVENTARIO
-        // =============================================
+            // =============================================
+            // KARDEX
+            // =============================================
 
-        {
-            id: 'almacen-inventario-fisico',
-            label: 'Inventario físico',
-            icon: 'fa-check-square-o',
-            path: '/almacen/inventario-fisico'
-        },
-
-        {
-            id: 'almacen-diferencias',
-            label: 'Diferencias de inventario',
-            icon: 'fa-balance-scale',
-            path: '/almacen/diferencias'
-        },
+            {
+                id: 'almacen-kardex',
+                label: 'Kardex',
+                icon: 'fa-list-alt',
+                path: '/almacen/kardex'
+            },
 
 
-        // =============================================
-        // COSTEO
-        // =============================================
+            // =============================================
+            // INVENTARIO
+            // =============================================
 
-        {
-            id: 'almacen-costeo',
-            label: 'Costeo',
-            icon: 'fa-calculator',
-            path: '/almacen/costeo'
-        },
+            {
+                id: 'almacen-inventario-fisico',
+                label: 'Inventario físico',
+                icon: 'fa-check-square-o',
+                path: '/almacen/inventario-fisico'
+            },
 
-        {
-            id: 'almacen-reglas-costeo',
-            label: 'Reglas de costeo',
-            icon: 'fa-sliders',
-            path: '/almacen/reglas-costeo'
-        },
+            {
+                id: 'almacen-diferencias',
+                label: 'Diferencias de inventario',
+                icon: 'fa-balance-scale',
+                path: '/almacen/diferencias'
+            },
 
 
-        // =============================================
-        // REPORTES
-        // =============================================
+            // =============================================
+            // COSTEO
+            // =============================================
 
-        {
-            id: 'almacen-consumo',
-            label: 'Consumo por semana / destino',
-            icon: 'fa-bar-chart',
-            path: '/almacen/reportes/consumo'
-        },
+            {
+                id: 'almacen-costeo',
+                label: 'Costeo',
+                icon: 'fa-calculator',
+                path: '/almacen/costeo'
+            },
 
-        {
-            id: 'almacen-stock-final',
-            label: 'Stock final valorizado',
-            icon: 'fa-cubes',
-            path: '/almacen/reportes/stock-final'
-        }
+            {
+                id: 'almacen-reglas-costeo',
+                label: 'Reglas de costeo',
+                icon: 'fa-sliders',
+                path: '/almacen/reglas-costeo'
+            },
 
-    ]
-}
+
+            // =============================================
+            // REPORTES
+            // =============================================
+
+            {
+                id: 'almacen-consumo',
+                label: 'Consumo por semana / destino',
+                icon: 'fa-bar-chart',
+                path: '/almacen/reportes/consumo'
+            },
+
+            {
+                id: 'almacen-stock-final',
+                label: 'Stock final valorizado',
+                icon: 'fa-cubes',
+                path: '/almacen/reportes/stock-final'
+            }
+
+        ]
+    }
 
 ]
+
 
 export default menuConfig

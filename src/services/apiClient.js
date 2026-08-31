@@ -6,7 +6,7 @@ import {
 
 
 const apiClient = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
     headers: {
         "Content-Type": "application/json",
     },
@@ -17,9 +17,9 @@ apiClient.interceptors.response.use(
 
     (response) => {
 
-        establecerEstadoServidor(true)
+        establecerEstadoServidor(true);
 
-        return response
+        return response;
 
     },
 
@@ -27,15 +27,15 @@ apiClient.interceptors.response.use(
 
         if (!error.response) {
 
-            establecerEstadoServidor(false)
+            establecerEstadoServidor(false);
 
         }
 
-        return Promise.reject(error)
+        return Promise.reject(error);
 
     }
 
-)
+);
 
 
 export default apiClient;

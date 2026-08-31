@@ -23,9 +23,13 @@ function AreaTable({
                     }}
                 >
 
-                    <h4 className="w3-margin">
+                    <h6 className="w3-margin">
+                        <i className="fa fa-list"></i>
+
+                        &nbsp;
+
                         Lista de áreas
-                    </h4>
+                    </h6>
 
                      <ServerStatus />
 
@@ -36,7 +40,7 @@ function AreaTable({
 
             {/* TABLA */}
 
-            <div className="w3-responsive">
+            <div className="w3-responsive w3-margin-bottom">
 
                 <table className="w3-table-all">
 
@@ -80,7 +84,7 @@ function AreaTable({
 
                             areasFiltradas.map(area => (
 
-                                <tr key={area.id}>
+                                <tr key={area.id} className='w3-hover-pale-green'>
 
                                     <td>
                                         {area.nombre}
@@ -100,7 +104,7 @@ function AreaTable({
 
                                         ) : (
 
-                                            <span className="w3-tag w3-grey">
+                                            <span className="w3-tag w3-red">
                                                 Inactivo
                                             </span>
 
@@ -160,11 +164,11 @@ function AreaTable({
 
                         ) : (
 
-                            <tr>
+                            <tr className='w3-pale-red'>
 
                                 <td
                                     colSpan="5"
-                                    className="w3-center w3-text-grey"
+                                    className="w3-center"
                                     style={{
                                         padding: '30px'
                                     }}

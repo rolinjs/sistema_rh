@@ -1,33 +1,49 @@
 import { useMemo, useState } from 'react'
 
-import useCargos from '../hooks/useCargos'
+import useSubAreas from '../hooks/useSubAreas'
 
-import CargoForm from '../components/CargoForm'
+import SubAreaForm from '../components/SubAreaForm'
 
-import CargoTable from '../components/CargoTable'
+import SubAreaTable from '../components/SubAreaTable'
 
 
-function CargosPage() {
+function SubAreasPage() {
+
+    // =====================================================
+    // DATOS DEL HOOK
+    // =====================================================
 
     const {
-        cargos,
         subAreas,
+        areas,
         loading,
         error
-    } = useCargos()
+    } = useSubAreas()
 
+
+    // =====================================================
+    // FORMULARIO
+    // =====================================================
 
     const [nombre, setNombre] = useState('')
 
-    const [subAreaId, setSubAreaId] = useState('')
+    const [areaId, setAreaId] = useState('')
 
     const [descripcion, setDescripcion] = useState('')
 
 
+    // =====================================================
+    // BÚSQUEDA
+    // =====================================================
+
     const [busqueda, setBusqueda] = useState('')
 
 
-    const cargosFiltrados = useMemo(() => {
+    // =====================================================
+    // FILTRAR SUBÁREAS
+    // =====================================================
+
+    const subAreasFiltradas = useMemo(() => {
 
         const texto =
             busqueda
@@ -37,34 +53,34 @@ function CargosPage() {
 
         if (!texto) {
 
-            return cargos
+            return subAreas
 
         }
 
 
-        return cargos.filter(
-            cargo =>
+        return subAreas.filter(
+            subArea =>
 
-                cargo.nombre
+                subArea.nombre
                     ?.toLowerCase()
                     .includes(texto)
 
                 ||
 
-                cargo.SubAreaNombre
+                subArea.areaNombre
                     ?.toLowerCase()
                     .includes(texto)
 
                 ||
 
-                cargo.descripcion
+                subArea.descripcion
                     ?.toLowerCase()
                     .includes(texto)
 
         )
 
     }, [
-        cargos,
+        subAreas,
         busqueda
     ])
 
@@ -73,46 +89,58 @@ function CargosPage() {
 
         <>
 
+            {/* =================================================
+                TÍTULO
+            ================================================= */}
+
             <div className="w3-margin-bottom">
 
                 <h4 className="w3-text-dark-grey">
 
-                    <i className="fa fa-briefcase"></i>
+                    <i className="fa fa-sitemap"></i>
 
                     &nbsp;
 
-                    Cargos
+                    SubÁreas
 
                 </h4>
 
 
                 <p className="w3-text-grey">
 
-                    Administración de los cargos de la empresa.
+                    Administración de las subáreas de la empresa.
 
                 </p>
 
             </div>
 
 
-            <CargoForm
+            {/* =================================================
+                FORMULARIO
+            ================================================= */}
+
+            <SubAreaForm
 
                 nombre={nombre}
 
                 setNombre={setNombre}
 
-                subAreaId={subAreaId}
+                areaId={areaId}
 
-                setSubAreaId={setSubAreaId}
+                setAreaId={setAreaId}
 
                 descripcion={descripcion}
 
                 setDescripcion={setDescripcion}
 
-                subAreas={subAreas}
+                areas={areas}
 
             />
 
+
+            {/* =================================================
+                BUSCADOR
+            ================================================= */}
 
             <div
                 className="w3-margin-top w3-small w3-margin-bottom"
@@ -161,10 +189,14 @@ function CargosPage() {
             </div>
 
 
-            <CargoTable
+            {/* =================================================
+                TABLA
+            ================================================= */}
 
-                cargosFiltrados={
-                    cargosFiltrados
+            <SubAreaTable
+
+                subAreasFiltradas={
+                    subAreasFiltradas
                 }
 
                 loading={loading}
@@ -180,4 +212,4 @@ function CargosPage() {
 }
 
 
-export default CargosPage
+export default SubAreasPage
