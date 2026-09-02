@@ -1,16 +1,34 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import useTrabajadores from '../hooks/useTrabajadores'
+
 
 function TrabajadorPage() {
 
     const navigate = useNavigate()
 
+
+    // =====================================================
+    // DATOS
+    // =====================================================
+
     const {
         trabajadores,
         areas,
         loading,
-        error
+        error,
+
+        page,
+        size,
+        totalPages,
+        totalElements,
+
+        irPagina,
+        siguientePagina,
+        paginaAnterior,
+        cambiarSize
+
     } = useTrabajadores()
 
 
@@ -18,67 +36,74 @@ function TrabajadorPage() {
     // FILTROS
     // =====================================================
 
-    const [busqueda, setBusqueda] = useState('')
-    const [filtroEstado, setFiltroEstado] = useState('TODOS')
-    const [fechaDesde, setFechaDesde] = useState('')
-    const [fechaHasta, setFechaHasta] = useState('')
+    const [busqueda, setBusqueda] =
+        useState('')
+
+    const [filtroEstado, setFiltroEstado] =
+        useState('TODOS')
+
+    const [fechaDesde, setFechaDesde] =
+        useState('')
+
+    const [fechaHasta, setFechaHasta] =
+        useState('')
 
 
     // =====================================================
     // FILTRAR
     // =====================================================
 
-    const trabajadoresFiltrados = trabajadores.filter(
-        trabajador => {
+    const trabajadoresFiltrados =
+        trabajadores.filter(
+            trabajador => {
 
-            const texto = busqueda
-                .toLowerCase()
-                .trim()
-
-
-            const coincideBusqueda =
-                trabajador.dni
-                    ?.toLowerCase()
-                    .includes(texto) ||
-
-                trabajador.nombreCompleto
-                    ?.toLowerCase()
-                    .includes(texto)
+                const texto =
+                    busqueda
+                        .toLowerCase()
+                        .trim()
 
 
-            const coincideEstado =
-                filtroEstado === 'TODOS' ||
-                trabajador.estado === filtroEstado
+                const coincideBusqueda =
+                    !texto ||
+                    trabajador.dni
+                        ?.toLowerCase()
+                        .includes(texto) ||
+                    trabajador.nombreCompleto
+                        ?.toLowerCase()
+                        .includes(texto)
 
 
-            /*
-             * fechaIngreso todavía no existe
-             * en nuestro TrabajadorResponseDTO.
-             *
-             * Por eso dejamos esta parte preparada,
-             * pero no aplicamos el filtro mientras
-             * el backend no tenga ese campo.
-             */
-            const coincideFechaDesde =
-                !fechaDesde ||
-                !trabajador.fechaIngreso ||
-                trabajador.fechaIngreso >= fechaDesde
+                const coincideEstado =
+                    filtroEstado === 'TODOS' ||
+                    trabajador.estado === filtroEstado
 
 
-            const coincideFechaHasta =
-                !fechaHasta ||
-                !trabajador.fechaIngreso ||
-                trabajador.fechaIngreso <= fechaHasta
+                /*
+                 * fechaIngreso todavía no existe
+                 * de forma completa en el DTO actual.
+                 */
+
+                const coincideFechaDesde =
+                    !fechaDesde ||
+                    !trabajador.fechaIngreso ||
+                    trabajador.fechaIngreso >= fechaDesde
 
 
-            return (
-                coincideBusqueda &&
-                coincideEstado &&
-                coincideFechaDesde &&
-                coincideFechaHasta
-            )
-        }
-    )
+                const coincideFechaHasta =
+                    !fechaHasta ||
+                    !trabajador.fechaIngreso ||
+                    trabajador.fechaIngreso <= fechaHasta
+
+
+                return (
+                    coincideBusqueda &&
+                    coincideEstado &&
+                    coincideFechaDesde &&
+                    coincideFechaHasta
+                )
+
+            }
+        )
 
 
     // =====================================================
@@ -88,9 +113,13 @@ function TrabajadorPage() {
     const limpiarFiltros = () => {
 
         setBusqueda('')
+
         setFiltroEstado('TODOS')
+
         setFechaDesde('')
+
         setFechaHasta('')
+
     }
 
 
@@ -101,14 +130,18 @@ function TrabajadorPage() {
     const formatearFecha = (fecha) => {
 
         if (!fecha) {
+
             return '—'
+
         }
+
 
         return new Date(
             `${fecha}T00:00:00`
         ).toLocaleDateString(
             'es-PE'
         )
+
     }
 
 
@@ -119,16 +152,22 @@ function TrabajadorPage() {
     const obtenerNombreArea = (areaId) => {
 
         if (!areaId) {
+
             return '—'
+
         }
 
-        const area = areas.find(
-            item => item.id === areaId
-        )
+
+        const area =
+            areas.find(
+                item => item.id === areaId
+            )
+
 
         return area
             ? area.nombre
             : '—'
+
     }
 
 
@@ -141,7 +180,86 @@ function TrabajadorPage() {
         return estado === 'ACTIVO'
             ? 'w3-green'
             : 'w3-red'
+
     }
+
+
+    // =====================================================
+    // INFORMACIÓN DE PAGINACIÓN
+    // =====================================================
+
+    const primeraPagina =
+        page === 0
+
+
+    const ultimaPagina =
+        totalPages === 0 ||
+        page >= totalPages - 1
+
+
+    const inicioRegistro =
+        totalElements === 0
+            ? 0
+            : page * size + 1
+
+
+    const finRegistro =
+        totalElements === 0
+            ? 0
+            : Math.min(
+                (page + 1) * size,
+                totalElements
+            )
+
+
+    // =====================================================
+    // PÁGINAS VISIBLES
+    // =====================================================
+
+    const obtenerPaginasVisibles = () => {
+
+        if (totalPages <= 1) {
+
+            return []
+
+        }
+
+
+        const paginas = []
+
+
+        const inicio =
+            Math.max(
+                0,
+                page - 2
+            )
+
+
+        const fin =
+            Math.min(
+                totalPages - 1,
+                page + 2
+            )
+
+
+        for (
+            let numero = inicio;
+            numero <= fin;
+            numero++
+        ) {
+
+            paginas.push(numero)
+
+        }
+
+
+        return paginas
+
+    }
+
+
+    const paginasVisibles =
+        obtenerPaginasVisibles()
 
 
     // =====================================================
@@ -159,7 +277,14 @@ function TrabajadorPage() {
 
             <div className="w3-margin-bottom">
 
-                <div className="w3-row">
+                <div
+                    className="w3-row"
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}
+                >
 
                     <div>
 
@@ -178,10 +303,11 @@ function TrabajadorPage() {
 
                         </h3>
 
-                        <span className="w3-text-grey w3-small">
 
+                        <span
+                            className="w3-text-grey w3-small"
+                        >
                             Administración y consulta de trabajadores.
-
                         </span>
 
                     </div>
@@ -190,7 +316,9 @@ function TrabajadorPage() {
                     <button
                         className="w3-button w3-small w3-right w3-flat-midnight-blue w3-round-small"
                         onClick={() =>
-                            navigate('/trabajadores/nuevo')
+                            navigate(
+                                '/trabajadores/nuevo'
+                            )
                         }
                     >
 
@@ -220,8 +348,6 @@ function TrabajadorPage() {
 
                 <div className="w3-padding-small">
 
-
-                    {/* TÍTULO */}
 
                     <div
                         style={{
@@ -267,14 +393,14 @@ function TrabajadorPage() {
                     </div>
 
 
-                    {/* CONTROLES */}
-
                     <div className="w3-row-padding">
 
 
                         {/* BUSCAR */}
 
-                        <div className="w3-col l3 m6 s12 w3-margin-bottom">
+                        <div
+                            className="w3-col l3 m6 s12 w3-margin-bottom"
+                        >
 
                             <label
                                 className="w3-text-grey"
@@ -282,9 +408,7 @@ function TrabajadorPage() {
                                     fontSize: '11px'
                                 }}
                             >
-
                                 DNI / Trabajador
-
                             </label>
 
 
@@ -330,7 +454,9 @@ function TrabajadorPage() {
 
                         {/* ESTADO */}
 
-                        <div className="w3-col l2 m6 s12 w3-margin-bottom">
+                        <div
+                            className="w3-col l2 m6 s12 w3-margin-bottom"
+                        >
 
                             <label
                                 className="w3-text-grey"
@@ -338,9 +464,7 @@ function TrabajadorPage() {
                                     fontSize: '11px'
                                 }}
                             >
-
                                 Estado
-
                             </label>
 
 
@@ -378,7 +502,9 @@ function TrabajadorPage() {
 
                         {/* FECHA DESDE */}
 
-                        <div className="w3-col l2 m6 s12 w3-margin-bottom">
+                        <div
+                            className="w3-col l2 m6 s12 w3-margin-bottom"
+                        >
 
                             <label
                                 className="w3-text-grey"
@@ -386,9 +512,7 @@ function TrabajadorPage() {
                                     fontSize: '11px'
                                 }}
                             >
-
                                 Ingreso desde
-
                             </label>
 
 
@@ -412,7 +536,9 @@ function TrabajadorPage() {
 
                         {/* FECHA HASTA */}
 
-                        <div className="w3-col l2 m6 s12 w3-margin-bottom">
+                        <div
+                            className="w3-col l2 m6 s12 w3-margin-bottom"
+                        >
 
                             <label
                                 className="w3-text-grey"
@@ -420,9 +546,7 @@ function TrabajadorPage() {
                                     fontSize: '11px'
                                 }}
                             >
-
                                 Ingreso hasta
-
                             </label>
 
 
@@ -446,7 +570,9 @@ function TrabajadorPage() {
 
                         {/* BOTONES */}
 
-                        <div className="w3-col l3 m12 s12 w3-margin-bottom">
+                        <div
+                            className="w3-col l3 m12 s12 w3-margin-bottom"
+                        >
 
                             <label
                                 style={{
@@ -454,9 +580,7 @@ function TrabajadorPage() {
                                     fontSize: '11px'
                                 }}
                             >
-
                                 Acciones
-
                             </label>
 
 
@@ -579,10 +703,22 @@ function TrabajadorPage() {
                         }}
                     >
 
-                        Total:
+                        Mostrando:
 
                         <strong style={{ marginLeft: '4px' }}>
-                            {trabajadoresFiltrados.length}
+                            {inicioRegistro}
+                        </strong>
+
+                        {' - '}
+
+                        <strong>
+                            {finRegistro}
+                        </strong>
+
+                        {' de '}
+
+                        <strong>
+                            {totalElements}
                         </strong>
 
                     </span>
@@ -599,8 +735,8 @@ function TrabajadorPage() {
                         maxHeight: '560px'
                     }}
                 >
-  
-                  <table
+
+                    <table
                         className="w3-table-all w3-small trabajadores-tabla-compacta"
                         style={{
                             minWidth: '1280px',
@@ -717,175 +853,168 @@ function TrabajadorPage() {
 
                                 </tr>
 
+                            ) : trabajadoresFiltrados.length === 0 ? (
+
+                                <tr>
+
+                                    <td
+                                        colSpan="12"
+                                        className="w3-center w3-text-grey"
+                                        style={{
+                                            padding: '22px'
+                                        }}
+                                    >
+
+                                        <i className="fa fa-info-circle"></i>
+
+                                        &nbsp;
+
+                                        No se encontraron trabajadores.
+
+                                    </td>
+
+                                </tr>
+
                             ) : (
 
                                 trabajadoresFiltrados.map(
                                     trabajador => (
 
-                                    <tr
-                                        key={trabajador.id}
-                                        className="w3-hover-pale-green"
-                                    >
-
-                                        <td
-                                            style={{
-                                                fontWeight: 600
-                                            }}
+                                        <tr
+                                            key={trabajador.id}
+                                            className="w3-hover-pale-green"
                                         >
 
-                                            {trabajador.dni}
-
-                                        </td>
-
-
-                                        <td
-                                            style={{
-                                                fontWeight: 600
-                                            }}
-                                        >
-
-                                            {trabajador.nombreCompleto}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {trabajador.sexoTrabajador}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {formatearFecha(
-                                                trabajador.fechaNacimiento
-                                            )}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {obtenerNombreArea(
-                                                trabajador.areaId
-                                            )}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {trabajador.subArea}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {trabajador.cargo}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {trabajador.cargoEspecifico}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {trabajador.telefono}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            <span
-                                                className={`w3-tag w3-round-small ${obtenerClaseEstado(
-                                                    trabajador.estado
-                                                )}`}
+                                            <td
                                                 style={{
-                                                    fontSize: '10px'
+                                                    fontWeight: 600
                                                 }}
                                             >
-
-                                                {trabajador.estado}
-
-                                            </span>
-
-                                        </td>
+                                                {trabajador.dni}
+                                            </td>
 
 
-                                        <td>
-
-                                            {formatearFecha(
-                                                trabajador.fechaIngreso
-                                            )}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            <div
+                                            <td
                                                 style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'center',
-                                                    gap: '3px'
+                                                    fontWeight: 600
                                                 }}
                                             >
+                                                {trabajador.nombreCompleto}
+                                            </td>
 
-                                                <button
-                                                    className="w3-button w3-light-grey w3-border w3-round-small"
-                                                    title="Ver trabajador"
+
+                                            <td>
+                                                {trabajador.sexoTrabajador}
+                                            </td>
+
+
+                                            <td>
+                                                {formatearFecha(
+                                                    trabajador.fechaNacimiento
+                                                )}
+                                            </td>
+
+
+                                            <td>
+                                                {obtenerNombreArea(
+                                                    trabajador.areaId
+                                                )}
+                                            </td>
+
+
+                                            <td>
+                                                {trabajador.subArea || '—'}
+                                            </td>
+
+
+                                            <td>
+                                                {trabajador.cargo || '—'}
+                                            </td>
+
+
+                                            <td>
+                                                {trabajador.cargoEspecifico || '—'}
+                                            </td>
+
+
+                                            <td>
+                                                {trabajador.telefono || '—'}
+                                            </td>
+
+
+                                            <td>
+
+                                                <span
+                                                    className={`w3-tag w3-round-small ${obtenerClaseEstado(
+                                                        trabajador.estado
+                                                    )}`}
+                                                    style={{
+                                                        fontSize: '10px'
+                                                    }}
+                                                >
+                                                    {trabajador.estado}
+                                                </span>
+
+                                            </td>
+
+
+                                            <td>
+                                                {formatearFecha(
+                                                    trabajador.fechaIngreso
+                                                )}
+                                            </td>
+
+
+                                            <td>
+
+                                                <div
+                                                    style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'center',
+                                                        gap: '3px'
+                                                    }}
                                                 >
 
-                                                    <i className="fa fa-eye"></i>
-
-                                                </button>
-
-
-                                                <button
-                                                    className="w3-button w3-light-grey w3-border w3-round-small"
-                                                    title="Editar trabajador"
-                                                >
-
-                                                    <i className="fa fa-pencil"></i>
-
-                                                </button>
+                                                    <button
+                                                        className="w3-button w3-light-grey w3-border w3-round-small"
+                                                        title="Ver trabajador"
+                                                    >
+                                                        <i className="fa fa-eye"></i>
+                                                    </button>
 
 
-                                                <button
-                                                    className="w3-button w3-light-grey w3-border w3-round-small"
-                                                    title="Activar / desactivar"
-                                                >
-
-                                                    <i className="fa fa-power-off"></i>
-
-                                                </button>
+                                                    <button
+                                                        className="w3-button w3-light-grey w3-border w3-round-small"
+                                                        title="Editar trabajador"
+                                                    >
+                                                        <i className="fa fa-pencil"></i>
+                                                    </button>
 
 
-                                                <button
-                                                    className="w3-button w3-light-grey w3-border w3-round-small"
-                                                    title="Generar contrato"
-                                                >
+                                                    <button
+                                                        className="w3-button w3-light-grey w3-border w3-round-small"
+                                                        title="Activar / desactivar"
+                                                    >
+                                                        <i className="fa fa-power-off"></i>
+                                                    </button>
 
-                                                    <i className="fa fa-file-text-o"></i>
 
-                                                </button>
+                                                    <button
+                                                        className="w3-button w3-light-grey w3-border w3-round-small"
+                                                        title="Generar contrato"
+                                                    >
+                                                        <i className="fa fa-file-text-o"></i>
+                                                    </button>
 
-                                            </div>
+                                                </div>
 
-                                        </td>
+                                            </td>
 
-                                    </tr>
+                                        </tr>
 
+                                    )
                                 )
-                                )
+
                             )}
 
                         </tbody>
@@ -896,7 +1025,7 @@ function TrabajadorPage() {
 
 
                 {/* =================================================
-                    PIE
+                    PIE / PAGINACIÓN
                 ================================================= */}
 
                 <div
@@ -906,38 +1035,125 @@ function TrabajadorPage() {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
+                        gap: '10px',
+                        flexWrap: 'wrap',
                         fontSize: '12px'
                     }}
                 >
 
-                    <span className="w3-text-grey">
 
-                        Mostrando
+                    {/* INFORMACIÓN */}
 
-                        <strong style={{ marginLeft: '4px' }}>
-                            {trabajadoresFiltrados.length}
+                    <div
+                        className="w3-text-grey"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                        }}
+                    >
+
+                        <span>
+                            Mostrando
+                        </span>
+
+                        <strong>
+                            {inicioRegistro}
                         </strong>
 
-                        {' '}
+                        <span>
+                            -
+                        </span>
 
-                        de
-
-                        <strong style={{ marginLeft: '4px' }}>
-                            {trabajadores.length}
+                        <strong>
+                            {finRegistro}
                         </strong>
 
-                        {' '}
+                        <span>
+                            de
+                        </span>
 
-                        trabajadores
+                        <strong>
+                            {totalElements}
+                        </strong>
 
-                    </span>
+                        <span>
+                            trabajadores
+                        </span>
+
+                    </div>
 
 
-                    <div>
+                    {/* TAMAÑO */}
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px'
+                        }}
+                    >
+
+                        <span className="w3-text-grey">
+                            Por página
+                        </span>
+
+
+                        <select
+                            className="w3-select w3-border w3-round-small"
+                            value={size}
+                            onChange={(event) =>
+                                cambiarSize(
+                                    event.target.value
+                                )
+                            }
+                            style={{
+                                width: '70px',
+                                height: '30px',
+                                padding: '2px 6px',
+                                fontSize: '11px'
+                            }}
+                        >
+
+                            <option value="10">
+                                10
+                            </option>
+
+                            <option value="20">
+                                20
+                            </option>
+
+                            <option value="50">
+                                50
+                            </option>
+
+                            <option value="100">
+                                100
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    {/* NAVEGACIÓN */}
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px'
+                        }}
+                    >
 
                         <button
-                            className="w3-button w3-light-grey w3-round-small"
-                            disabled
+                            className="w3-button w3-light-grey w3-border w3-round-small"
+                            onClick={paginaAnterior}
+                            disabled={
+                                loading ||
+                                primeraPagina
+                            }
+                            title="Página anterior"
                         >
 
                             <i className="fa fa-angle-left"></i>
@@ -945,23 +1161,40 @@ function TrabajadorPage() {
                         </button>
 
 
+                        {paginasVisibles.map(
+                            numeroPagina => (
+
+                                <button
+                                    key={numeroPagina}
+                                    className={
+                                        numeroPagina === page
+                                            ? 'w3-button w3-flat-midnight-blue w3-round-small'
+                                            : 'w3-button w3-light-grey w3-border w3-round-small'
+                                    }
+                                    onClick={() =>
+                                        irPagina(
+                                            numeroPagina
+                                        )
+                                    }
+                                    disabled={loading}
+                                >
+
+                                    {numeroPagina + 1}
+
+                                </button>
+
+                            )
+                        )}
+
+
                         <button
-                            className="w3-button w3-flat-midnight-blue w3-round-small"
-                            style={{
-                                marginLeft: '3px'
-                            }}
-                        >
-
-                            1
-
-                        </button>
-
-
-                        <button
-                            className="w3-button w3-light-grey w3-round-small"
-                            style={{
-                                marginLeft: '3px'
-                            }}
+                            className="w3-button w3-light-grey w3-border w3-round-small"
+                            onClick={siguientePagina}
+                            disabled={
+                                loading ||
+                                ultimaPagina
+                            }
+                            title="Página siguiente"
                         >
 
                             <i className="fa fa-angle-right"></i>
@@ -969,6 +1202,34 @@ function TrabajadorPage() {
                         </button>
 
                     </div>
+
+
+                    {/* PÁGINA */}
+
+                    <span
+                        className="w3-text-grey"
+                        style={{
+                            fontSize: '11px'
+                        }}
+                    >
+
+                        Página
+
+                        {' '}
+
+                        <strong>
+                            {totalPages === 0
+                                ? 0
+                                : page + 1}
+                        </strong>
+
+                        {' de '}
+
+                        <strong>
+                            {totalPages}
+                        </strong>
+
+                    </span>
 
                 </div>
 
@@ -979,5 +1240,6 @@ function TrabajadorPage() {
     )
 
 }
+
 
 export default TrabajadorPage
