@@ -279,11 +279,11 @@ function TrabajadorPage() {
 
                 <div
                     className="w3-row"
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                    }}
+                    // style={{
+                    //     display: 'flex',
+                    //     justifyContent: 'space-between',
+                    //     alignItems: 'center'
+                    // }}
                 >
 
                     <div>
