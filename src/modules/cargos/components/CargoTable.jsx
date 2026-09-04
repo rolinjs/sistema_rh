@@ -1,59 +1,78 @@
-function CargoTable({
+import ServerStatus from '../../../components/ui/ServerStatus';
 
+const CargoTable = ({
     cargosFiltrados,
     loading,
-    error
-
-}) {
+    error,
+    onEditar,
+    onCambiarEstado,
+    cambiandoEstado
+}) => {
 
     const formatearFecha = (fecha) => {
 
         if (!fecha) {
-
-            return '—'
-
+            return '-'
         }
 
+        const fechaFormateada = new Date(fecha)
 
-        return new Date(fecha).toLocaleString(
-            'es-PE',
-            {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }
-        )
+        if (Number.isNaN(fechaFormateada.getTime())) {
+            return '-'
+        }
 
+        return fechaFormateada.toLocaleString('es-PE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
     }
 
 
-    const obtenerEstado = (estado) => {
+    const manejarEditar = (cargo) => {
 
-        if (estado === 'ACTIVO') {
+        console.log('Editar cargo:', cargo)
 
-            return (
+        if (typeof onEditar === 'function') {
+            onEditar(cargo)
+        }
+    }
 
-                <span className="w3-tag w3-green">
 
-                    Activo
+    const manejarEstado = async (cargo) => {
 
-                </span>
+        const accion =
+            cargo.estado === 'ACTIVO'
+                ? 'desactivar'
+                : 'activar'
 
-            )
+        const confirmado = window.confirm(
+            `¿Está seguro de ${accion} el cargo "${cargo.nombre}"?`
+        )
 
+        if (!confirmado) {
+            return
         }
 
+        console.log(
+            'Cambiar estado cargo:',
+            cargo.id
+        )
+
+        if (typeof onCambiarEstado === 'function') {
+            await onCambiarEstado(cargo)
+        }
+    }
+
+
+    const obtenerSubAreaNombre = (cargo) => {
 
         return (
-
-            <span className="w3-tag w3-red">
-
-                Inactivo
-
-            </span>
-
+            cargo.SubAreaNombre
+            || cargo.subAreaNombre
+            || '-'
         )
 
     }
@@ -69,7 +88,9 @@ function CargoTable({
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between'
+                        justifyContent: 'space-between',
+                        gap: '15px',
+                        flexWrap: 'wrap'
                     }}
                 >
 
@@ -84,25 +105,16 @@ function CargoTable({
                     </h6>
 
 
-                    <span
-                        className="w3-text-grey"
-                        style={{
-                            fontSize: '12px'
-                        }}
-                    >
-
-                        Total: {cargosFiltrados.length}
-
-                    </span>
+                    <ServerStatus />
 
                 </div>
 
             </header>
 
 
-            <div className="w3-responsive">
+            <div className="w3-responsive w3-margin-bottom">
 
-                <table className="w3-table-all">
+                <table className="w3-table-all w3-small">
 
                     <thead>
 
@@ -124,18 +136,28 @@ function CargoTable({
                                 Estado
                             </th>
 
-                            <th>
+                            <th
+                                style={{
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
                                 Fecha de creación
                             </th>
 
-                            <th>
+                            <th
+                                style={{
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
                                 Actualización
                             </th>
 
-                            <th className="w3-center">
-
+                            <th
+                                style={{
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
                                 Acciones
-
                             </th>
 
                         </tr>
@@ -156,15 +178,8 @@ function CargoTable({
 
                                 <td
                                     colSpan="7"
-                                    className="w3-center w3-text-grey"
-                                    style={{
-                                        padding: '30px'
-                                    }}
+                                    className="w3-center"
                                 >
-
-                                    <i className="fa fa-spinner fa-spin"></i>
-
-                                    &nbsp;
 
                                     Cargando cargos...
 
@@ -179,135 +194,22 @@ function CargoTable({
                             ERROR
                         ================================================= */}
 
-                        {!loading &&
-                            error && (
+                        {!loading && error && (
 
-                                <tr>
+                            <tr>
 
-                                    <td
-                                        colSpan="7"
-                                        className="w3-center w3-pale-red"
-                                        style={{
-                                            padding: '30px'
-                                        }}
-                                    >
+                                <td
+                                    colSpan="7"
+                                    className="w3-center w3-text-red"
+                                >
 
-                                        <i className="fa fa-warning"></i>
+                                    {error}
 
-                                        &nbsp;
+                                </td>
 
-                                        {error}
+                            </tr>
 
-                                    </td>
-
-                                </tr>
-
-                            )
-                        }
-
-
-                        {/* =================================================
-                            DATOS
-                        ================================================= */}
-
-                        {!loading &&
-                            !error &&
-                            cargosFiltrados.map(
-                                cargo => (
-
-                                    <tr
-                                        key={cargo.id}
-                                        className="w3-hover-pale-green"
-                                    >
-
-                                        <td
-                                            style={{
-                                                fontWeight: 600
-                                            }}
-                                        >
-
-                                            {cargo.nombre}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {
-                                                cargo.SubAreaNombre
-                                                || '—'
-                                            }
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {
-                                                cargo.descripcion
-                                                || '—'
-                                            }
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {obtenerEstado(
-                                                cargo.estado
-                                            )}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {formatearFecha(
-                                                cargo.fechaRegistro
-                                            )}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {formatearFecha(
-                                                cargo.fechaActualizacion
-                                            )}
-
-                                        </td>
-
-
-                                        <td className="w3-center">
-
-                                            <button
-                                                type="button"
-                                                className="w3-button w3-tiny w3-round w3-border w3-light-grey w3-margin-right"
-                                                title="Editar cargo"
-                                            >
-
-                                                <i className="fa fa-pencil"></i>
-
-                                            </button>
-
-
-                                            <button
-                                                type="button"
-                                                className="w3-button w3-tiny w3-round w3-border w3-light-grey"
-                                                title="Activar / desactivar"
-                                            >
-
-                                                <i className="fa fa-ban"></i>
-
-                                            </button>
-
-                                        </td>
-
-                                    </tr>
-
-                                )
-                            )
-                        }
+                        )}
 
 
                         {/* =================================================
@@ -322,15 +224,8 @@ function CargoTable({
 
                                     <td
                                         colSpan="7"
-                                        className="w3-center w3-text-grey"
-                                        style={{
-                                            padding: '30px'
-                                        }}
+                                        className="w3-center"
                                     >
-
-                                        <i className="fa fa-search"></i>
-
-                                        &nbsp;
 
                                         No se encontraron cargos.
 
@@ -338,8 +233,172 @@ function CargoTable({
 
                                 </tr>
 
-                            )
-                        }
+                            )}
+
+
+                        {/* =================================================
+                            DATOS
+                        ================================================= */}
+
+                        {!loading &&
+                            !error &&
+                            cargosFiltrados.map((cargo) => (
+
+                                <tr
+                                    key={cargo.id}
+                                    className="w3-hover-pale-green"
+                                >
+
+                                    <td
+                                        style={{
+                                            paddingTop: '6px',
+                                            paddingBottom: '6px'
+                                        }}
+                                    >
+
+                                        {cargo.nombre}
+
+                                    </td>
+
+
+                                    <td
+                                        style={{
+                                            paddingTop: '6px',
+                                            paddingBottom: '6px'
+                                        }}
+                                    >
+
+                                        {obtenerSubAreaNombre(
+                                            cargo
+                                        )}
+
+                                    </td>
+
+
+                                    <td
+                                        style={{
+                                            paddingTop: '6px',
+                                            paddingBottom: '6px'
+                                        }}
+                                    >
+
+                                        {cargo.descripcion || '-'}
+
+                                    </td>
+
+
+                                    <td
+                                        style={{
+                                            paddingTop: '6px',
+                                            paddingBottom: '6px',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+
+                                        <span
+                                            className={
+                                                cargo.estado === 'ACTIVO'
+                                                    ? 'w3-tag w3-green w3-round'
+                                                    : 'w3-tag w3-red w3-round'
+                                            }
+                                        >
+
+                                            {cargo.estado}
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td
+                                        style={{
+                                            paddingTop: '6px',
+                                            paddingBottom: '6px',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+
+                                        {formatearFecha(
+                                            cargo.fechaRegistro
+                                        )}
+
+                                    </td>
+
+
+                                    <td
+                                        style={{
+                                            paddingTop: '6px',
+                                            paddingBottom: '6px',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+
+                                        {formatearFecha(
+                                            cargo.fechaActualizacion
+                                        )}
+
+                                    </td>
+
+
+                                    <td
+                                        style={{
+                                            paddingTop: '6px',
+                                            paddingBottom: '6px',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+
+                                        <button
+                                            type="button"
+                                            className="w3-button w3-tiny w3-round w3-border w3-light-grey w3-margin-right"
+                                            title="Editar"
+                                            onClick={() =>
+                                                manejarEditar(cargo)
+                                            }
+                                            style={{
+                                                display: 'inline-block',
+                                                verticalAlign: 'middle'
+                                            }}
+                                        >
+
+                                            <i className="fa fa-pencil"></i>
+
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            className="w3-button w3-tiny w3-round w3-border w3-light-grey"
+                                            title={
+                                                cargo.estado === 'ACTIVO'
+                                                    ? 'Desactivar'
+                                                    : 'Activar'
+                                            }
+                                            onClick={() =>
+                                                manejarEstado(cargo)
+                                            }
+                                            disabled={cambiandoEstado}
+                                            style={{
+                                                display: 'inline-block',
+                                                verticalAlign: 'middle'
+                                            }}
+                                        >
+
+                                            <i
+                                                className={
+                                                    cargo.estado === 'ACTIVO'
+                                                        ? 'fa fa-ban'
+                                                        : 'fa fa-check'
+                                                }
+                                            ></i>
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+                            ))}
 
                     </tbody>
 
@@ -350,8 +409,6 @@ function CargoTable({
         </div>
 
     )
-
 }
-
 
 export default CargoTable

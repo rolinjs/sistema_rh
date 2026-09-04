@@ -9,22 +9,48 @@ function CargoForm({
     descripcion,
     setDescripcion,
 
-    subAreas
+    subAreas,
+
+    onGuardar,
+    guardando
 
 }) {
 
-    const guardarCargo = (event) => {
+    const guardarCargo = async (event) => {
 
         event.preventDefault()
 
-        console.log(
-            'DATOS DEL CARGO:',
-            {
-                nombre,
-                subAreaId,
-                descripcion
-            }
-        )
+        if (!nombre.trim()) {
+
+            window.alert(
+                'Ingrese el nombre del cargo.'
+            )
+
+            return
+
+        }
+
+        if (!subAreaId) {
+
+            window.alert(
+                'Seleccione una subárea.'
+            )
+
+            return
+
+        }
+
+        const datos = {
+
+            nombre: nombre.trim(),
+
+            subAreaId: subAreaId,
+
+            descripcion: descripcion.trim()
+
+        }
+
+        await onGuardar(datos)
 
     }
 
@@ -54,7 +80,7 @@ function CargoForm({
 
         <div className="w3-card w3-white">
 
-             <header className="w3-container w3-light-grey">
+            <header className="w3-container w3-light-grey">
 
                 <h4>
 
@@ -62,7 +88,7 @@ function CargoForm({
 
                     &nbsp;
 
-                   Registrar cargo
+                    Registrar cargo
 
                 </h4>
 
@@ -106,6 +132,7 @@ function CargoForm({
                                     event.target.value
                                 )
                             }
+                            disabled={guardando}
                         />
 
                     </div>
@@ -138,6 +165,7 @@ function CargoForm({
                                     event.target.value
                                 )
                             }
+                            disabled={guardando}
                         >
 
                             <option value="">
@@ -196,6 +224,7 @@ function CargoForm({
                                     event.target.value
                                 )
                             }
+                            disabled={guardando}
                         />
 
                     </div>
@@ -207,7 +236,7 @@ function CargoForm({
                     BOTONES
                 ================================================= */}
 
-                <div 
+                <div
                     className="w3-row-padding w3-margin-bottom"
                     style={{
                         marginTop: '15px'
@@ -224,13 +253,17 @@ function CargoForm({
                                 color: '#fff',
                                 marginRight: '8px'
                             }}
+                            disabled={guardando}
                         >
 
                             <i className="fa fa-save"></i>
 
                             &nbsp;
 
-                            Guardar
+                            {guardando
+                                ? 'Guardando'
+                                : 'Guardar'
+                            }
 
                         </button>
 

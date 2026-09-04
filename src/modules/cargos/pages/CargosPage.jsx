@@ -13,19 +13,47 @@ function CargosPage() {
         cargos,
         subAreas,
         loading,
-        error
+        error,
+        guardando,
+        cambiandoEstado,
+        crear,
+        editar,
+        cambiarEstado
     } = useCargos()
 
 
+    // =====================================================
+    // FORMULARIO
+    // =====================================================
+
     const [nombre, setNombre] = useState('')
 
-    const [subAreaId, setSubAreaId] = useState('')
+    const [subAreaId, setSubAreaId] =
+        useState('')
 
-    const [descripcion, setDescripcion] = useState('')
+    const [descripcion, setDescripcion] =
+        useState('')
 
 
-    const [busqueda, setBusqueda] = useState('')
+    // =====================================================
+    // BÚSQUEDA
+    // =====================================================
 
+    const [busqueda, setBusqueda] =
+        useState('')
+
+
+    // =====================================================
+    // CARGO EN EDICIÓN
+    // =====================================================
+
+    const [cargoEditando, setCargoEditando] =
+        useState(null)
+
+
+    // =====================================================
+    // FILTRAR CARGOS
+    // =====================================================
 
     const cargosFiltrados = useMemo(() => {
 
@@ -57,6 +85,12 @@ function CargosPage() {
 
                 ||
 
+                cargo.subAreaNombre
+                    ?.toLowerCase()
+                    .includes(texto)
+
+                ||
+
                 cargo.descripcion
                     ?.toLowerCase()
                     .includes(texto)
@@ -67,6 +101,175 @@ function CargosPage() {
         cargos,
         busqueda
     ])
+
+
+    // =====================================================
+    // LIMPIAR FORMULARIO
+    // =====================================================
+
+    const limpiarFormulario = () => {
+
+        setNombre('')
+
+        setSubAreaId('')
+
+        setDescripcion('')
+
+        setCargoEditando(null)
+
+    }
+
+
+    // =====================================================
+    // GUARDAR / ACTUALIZAR
+    // =====================================================
+
+    const manejarGuardar = async (
+        datos
+    ) => {
+
+        let resultado
+
+
+        // =================================================
+        // EDITAR
+        // =================================================
+
+        if (cargoEditando) {
+
+            resultado =
+                await editar(
+                    cargoEditando.id,
+                    datos
+                )
+
+
+            if (resultado.ok) {
+
+                window.alert(
+                    'Cargo actualizado correctamente.'
+                )
+
+                limpiarFormulario()
+
+            }
+
+
+            return resultado
+
+        }
+
+
+        // =================================================
+        // CREAR
+        // =================================================
+
+        resultado =
+            await crear(
+                datos
+            )
+
+
+        if (resultado.ok) {
+
+            window.alert(
+                'Cargo registrado correctamente.'
+            )
+
+            limpiarFormulario()
+
+        }
+
+
+        return resultado
+
+    }
+
+
+    // =====================================================
+    // EDITAR
+    // =====================================================
+
+    const manejarEditar = (
+        cargo
+    ) => {
+
+        console.log(
+            'CARGO SELECCIONADO PARA EDITAR:',
+            cargo
+        )
+
+
+        setCargoEditando(
+            cargo
+        )
+
+
+        setNombre(
+            cargo.nombre || ''
+        )
+
+
+        /*
+         * El backend puede entregar subAreaId.
+         * Se usa directamente para cargar
+         * el select correspondiente.
+         */
+
+        setSubAreaId(
+            cargo.subAreaId || ''
+        )
+
+
+        setDescripcion(
+            cargo.descripcion || ''
+        )
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+
+    }
+
+
+    // =====================================================
+    // CAMBIAR ESTADO
+    // =====================================================
+
+    const manejarCambiarEstado = async (
+        cargo
+    ) => {
+
+        const resultado =
+            await cambiarEstado(
+                cargo.id
+            )
+
+
+        if (resultado.ok) {
+
+            const nuevoEstado =
+                resultado.data?.estado
+
+
+            window.alert(
+
+                nuevoEstado === 'ACTIVO'
+
+                    ? 'Cargo activado correctamente.'
+
+                    : 'Cargo desactivado correctamente.'
+
+            )
+
+        }
+
+
+        return resultado
+
+    }
 
 
     return (
@@ -110,6 +313,10 @@ function CargosPage() {
                 setDescripcion={setDescripcion}
 
                 subAreas={subAreas}
+
+                onGuardar={manejarGuardar}
+
+                guardando={guardando}
 
             />
 
@@ -167,9 +374,25 @@ function CargosPage() {
                     cargosFiltrados
                 }
 
-                loading={loading}
+                loading={
+                    loading
+                }
 
-                error={error}
+                error={
+                    error
+                }
+
+                onEditar={
+                    manejarEditar
+                }
+
+                onCambiarEstado={
+                    manejarCambiarEstado
+                }
+
+                cambiandoEstado={
+                    cambiandoEstado
+                }
 
             />
 

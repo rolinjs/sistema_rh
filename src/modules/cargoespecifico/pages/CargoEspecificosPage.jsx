@@ -24,7 +24,17 @@ function CargoEspecificosPage() {
 
         loading,
 
-        error
+        error,
+
+        guardando,
+
+        cambiandoEstado,
+
+        crear,
+
+        editar,
+
+        cambiarEstado
 
     } = useCargoEspecificos()
 
@@ -53,6 +63,16 @@ function CargoEspecificosPage() {
         busqueda,
         setBusqueda
     ] = useState('')
+
+
+    // =====================================================
+    // CARGO ESPECÍFICO EN EDICIÓN
+    // =====================================================
+
+    const [
+        cargoEspecificoEditando,
+        setCargoEspecificoEditando
+    ] = useState(null)
 
 
     // =====================================================
@@ -103,36 +123,205 @@ function CargoEspecificosPage() {
 
 
     // =====================================================
-    // GUARDAR
+    // LIMPIAR FORMULARIO
     // =====================================================
 
-    const guardarCargoEspecifico = (
-        event
-    ) => {
+    const limpiarFormulario = () => {
 
-        event.preventDefault()
+        setNombre('')
+
+        setCargoId('')
+
+        setCargoEspecificoEditando(null)
+
+    }
 
 
-        const datos = {
+    // =====================================================
+    // CANCELAR EDICIÓN
+    // =====================================================
 
-            nombre,
+    const cancelarEdicion = () => {
 
-            cargoId
+        limpiarFormulario()
+
+    }
+
+
+    // =====================================================
+    // GUARDAR / ACTUALIZAR
+    // =====================================================
+
+    const guardarCargoEspecifico =
+        async (event) => {
+
+            event.preventDefault()
+
+
+            if (!nombre.trim()) {
+
+                window.alert(
+                    'Ingrese el nombre del cargo específico.'
+                )
+
+                return
+
+            }
+
+
+            if (!cargoId) {
+
+                window.alert(
+                    'Seleccione un cargo.'
+                )
+
+                return
+
+            }
+
+
+            const datos = {
+
+                nombre:
+                    nombre.trim(),
+
+                cargoId:
+                    cargoId
+
+            }
+
+
+            let resultado
+
+
+            // =================================================
+            // EDITAR
+            // =================================================
+
+            if (
+                cargoEspecificoEditando
+            ) {
+
+                resultado =
+                    await editar(
+                        cargoEspecificoEditando.id,
+                        datos
+                    )
+
+
+                if (resultado.ok) {
+
+                    window.alert(
+                        'Cargo específico actualizado correctamente.'
+                    )
+
+                    limpiarFormulario()
+
+                }
+
+
+                return
+
+            }
+
+
+            // =================================================
+            // CREAR
+            // =================================================
+
+            resultado =
+                await crear(
+                    datos
+                )
+
+
+            if (resultado.ok) {
+
+                window.alert(
+                    'Cargo específico registrado correctamente.'
+                )
+
+                limpiarFormulario()
+
+            }
 
         }
 
 
+    // =====================================================
+    // EDITAR
+    // =====================================================
+
+    const manejarEditar = (
+        cargoEspecifico
+    ) => {
+
         console.log(
-            'CARGO ESPECÍFICO:',
-            datos
+            'CARGO ESPECÍFICO SELECCIONADO:',
+            cargoEspecifico
         )
 
 
-        alert(
-            'Cargo específico listo para guardar.'
+        setCargoEspecificoEditando(
+            cargoEspecifico
         )
+
+
+        setNombre(
+            cargoEspecifico.nombre || ''
+        )
+
+
+        setCargoId(
+            cargoEspecifico.cargoId || ''
+        )
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
 
     }
+
+
+    // =====================================================
+    // CAMBIAR ESTADO
+    // =====================================================
+
+    const manejarCambiarEstado =
+        async (
+            cargoEspecifico
+        ) => {
+
+            const resultado =
+                await cambiarEstado(
+                    cargoEspecifico.id
+                )
+
+
+            if (resultado.ok) {
+
+                const nuevoEstado =
+                    resultado.data?.estado
+
+
+                window.alert(
+
+                    nuevoEstado === 'ACTIVO'
+
+                        ? 'Cargo específico activado correctamente.'
+
+                        : 'Cargo específico desactivado correctamente.'
+
+                )
+
+            }
+
+
+            return resultado
+
+        }
 
 
     // =====================================================
@@ -227,6 +416,18 @@ function CargoEspecificosPage() {
                     importarArchivo
                 }
 
+                guardando={
+                    guardando
+                }
+
+                editando={
+                    cargoEspecificoEditando
+                }
+
+                onCancelar={
+                    cancelarEdicion
+                }
+
             />
 
 
@@ -297,6 +498,18 @@ function CargoEspecificosPage() {
 
                 error={
                     error
+                }
+
+                onEditar={
+                    manejarEditar
+                }
+
+                onCambiarEstado={
+                    manejarCambiarEstado
+                }
+
+                cambiandoEstado={
+                    cambiandoEstado
                 }
 
             />

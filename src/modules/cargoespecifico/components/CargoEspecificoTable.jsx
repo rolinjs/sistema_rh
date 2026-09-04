@@ -4,9 +4,118 @@ function CargoEspecificoTable({
 
     loading,
 
-    error
+    error,
+
+    onEditar,
+
+    onCambiarEstado,
+
+    cambiandoEstado
 
 }) {
+
+    const formatearFecha = (fecha) => {
+
+        if (!fecha) {
+
+            return '—'
+
+        }
+
+
+        const fechaFormateada =
+            new Date(fecha)
+
+
+        if (
+            Number.isNaN(
+                fechaFormateada.getTime()
+            )
+        ) {
+
+            return '—'
+
+        }
+
+
+        return fechaFormateada.toLocaleString(
+            'es-PE',
+            {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }
+        )
+
+    }
+
+
+    const manejarEditar = (
+        cargoEspecifico
+    ) => {
+
+        console.log(
+            'Editar cargo específico:',
+            cargoEspecifico
+        )
+
+
+        if (
+            typeof onEditar === 'function'
+        ) {
+
+            onEditar(
+                cargoEspecifico
+            )
+
+        }
+
+    }
+
+
+    const manejarEstado = async (
+        cargoEspecifico
+    ) => {
+
+        const accion =
+            cargoEspecifico.estado === 'ACTIVO'
+                ? 'desactivar'
+                : 'activar'
+
+
+        const confirmado =
+            window.confirm(
+                `¿Está seguro de ${accion} el cargo específico "${cargoEspecifico.nombre}"?`
+            )
+
+
+        if (!confirmado) {
+
+            return
+
+        }
+
+
+        console.log(
+            'Cambiar estado cargo específico:',
+            cargoEspecifico.id
+        )
+
+
+        if (
+            typeof onCambiarEstado === 'function'
+        ) {
+
+            await onCambiarEstado(
+                cargoEspecifico
+            )
+
+        }
+
+    }
+
 
     return (
 
@@ -63,129 +172,77 @@ function CargoEspecificoTable({
                 TABLA
             ================================================= */}
 
-            <table className="w3-table-all">
+            <div className="w3-responsive w3-margin-bottom">
 
-                <thead>
+                <table className="w3-table-all w3-small">
 
-                    <tr>
-
-                        <th>
-                            Cargo específico
-                        </th>
-
-                        <th>
-                            Cargo
-                        </th>
-
-                        <th>
-                            Estado
-                        </th>
-
-                        <th>
-                            Fecha de creación
-                        </th>
-
-                        <th>
-                            Actualización
-                        </th>
-
-                        <th
-                            style={{
-                                textAlign: 'center'
-                            }}
-                        >
-                            Acciones
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-
-                    {/* =================================================
-                        CARGANDO
-                    ================================================= */}
-
-                    {loading && (
+                    <thead>
 
                         <tr>
 
-                            <td
-                                colSpan="6"
-                                className="w3-center w3-text-grey"
+                            <th>
+                                Cargo específico
+                            </th>
+
+                            <th>
+                                Cargo
+                            </th>
+
+                            <th>
+                                Estado
+                            </th>
+
+                            <th
                                 style={{
-                                    padding: '30px'
+                                    whiteSpace: 'nowrap'
                                 }}
                             >
+                                Fecha de creación
+                            </th>
 
-                                <i className="fa fa-spinner fa-spin"></i>
+                            <th
+                                style={{
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                Actualización
+                            </th>
 
-                                &nbsp;
-
-                                Cargando cargos específicos...
-
-                            </td>
+                            <th
+                                style={{
+                                    textAlign: 'center',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                Acciones
+                            </th>
 
                         </tr>
 
-                    )}
+                    </thead>
 
 
-                    {/* =================================================
-                        ERROR
-                    ================================================= */}
-
-                    {!loading && error && (
-
-                        <tr>
-
-                            <td
-                                colSpan="6"
-                                className="w3-center w3-pale-red"
-                                style={{
-                                    padding: '30px'
-                                }}
-                            >
-
-                                <i className="fa fa-warning"></i>
-
-                                &nbsp;
-
-                                {error}
-
-                            </td>
-
-                        </tr>
-
-                    )}
+                    <tbody>
 
 
-                    {/* =================================================
-                        SIN RESULTADOS
-                    ================================================= */}
+                        {/* =================================================
+                            CARGANDO
+                        ================================================= */}
 
-                    {!loading &&
-                        !error &&
-                        cargosEspecificosFiltrados.length === 0 && (
+                        {loading && (
 
                             <tr>
 
                                 <td
                                     colSpan="6"
                                     className="w3-center w3-text-grey"
-                                    style={{
-                                        padding: '30px'
-                                    }}
                                 >
 
-                                    <i className="fa fa-info-circle"></i>
+                                    <i className="fa fa-spinner fa-spin"></i>
 
                                     &nbsp;
 
-                                    No se encontraron cargos específicos.
+                                    Cargando cargos específicos...
 
                                 </td>
 
@@ -194,100 +251,191 @@ function CargoEspecificoTable({
                         )}
 
 
-                    {/* =================================================
-                        DATOS
-                    ================================================= */}
+                        {/* =================================================
+                            ERROR
+                        ================================================= */}
 
-                    {!loading &&
-                        !error &&
-                        cargosEspecificosFiltrados.map(
-                            cargoEspecifico => (
+                        {!loading &&
+                            error && (
 
-                                <tr
-                                    key={
-                                        cargoEspecifico.id
-                                    }
-                                    className="w3-hover-pale-green"
-                                >
+                                <tr>
 
                                     <td
-                                        style={{
-                                            fontWeight: 600
-                                        }}
+                                        colSpan="6"
+                                        className="w3-center w3-pale-red"
                                     >
 
-                                        {
-                                            cargoEspecifico.nombre
-                                        }
+                                        <i className="fa fa-warning"></i>
+
+                                        &nbsp;
+
+                                        {error}
 
                                     </td>
 
+                                </tr>
 
-                                    <td>
+                            )}
 
-                                        {
-                                            cargoEspecifico.cargoNombre
-                                            || '-'
-                                        }
+
+                        {/* =================================================
+                            SIN RESULTADOS
+                        ================================================= */}
+
+                        {!loading &&
+                            !error &&
+                            cargosEspecificosFiltrados.length === 0 && (
+
+                                <tr>
+
+                                    <td
+                                        colSpan="6"
+                                        className="w3-center w3-text-grey"
+                                    >
+
+                                        <i className="fa fa-info-circle"></i>
+
+                                        &nbsp;
+
+                                        No se encontraron cargos específicos.
 
                                     </td>
 
+                                </tr>
 
-                                    <td>
+                            )}
 
-                                        <span
-                                            className={
-                                                cargoEspecifico.estado === 'ACTIVO'
-                                                    ? 'w3-tag w3-green'
-                                                    : 'w3-tag w3-red'
-                                            }
+
+                        {/* =================================================
+                            DATOS
+                        ================================================= */}
+
+                        {!loading &&
+                            !error &&
+                            cargosEspecificosFiltrados.map(
+                                cargoEspecifico => (
+
+                                    <tr
+                                        key={
+                                            cargoEspecifico.id
+                                        }
+                                        className="w3-hover-pale-green"
+                                    >
+
+                                        <td
                                             style={{
-                                                fontSize: '10px'
+                                                fontWeight: 600,
+                                                paddingTop: '6px',
+                                                paddingBottom: '6px'
                                             }}
                                         >
 
                                             {
-                                                cargoEspecifico.estado
+                                                cargoEspecifico.nombre
                                             }
 
-                                        </span>
-
-                                    </td>
+                                        </td>
 
 
-                                    <td>
-
-                                        {
-                                            cargoEspecifico.fechaRegistro
-                                            || '—'
-                                        }
-
-                                    </td>
-
-
-                                    <td>
-
-                                        {
-                                            cargoEspecifico.fechaActualizacion
-                                            || '—'
-                                        }
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <div
+                                        <td
                                             style={{
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                gap: '5px'
+                                                paddingTop: '6px',
+                                                paddingBottom: '6px'
+                                            }}
+                                        >
+
+                                            {
+                                                cargoEspecifico.cargoNombre
+                                                || '-'
+                                            }
+
+                                        </td>
+
+
+                                        <td
+                                            style={{
+                                                paddingTop: '6px',
+                                                paddingBottom: '6px',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+
+                                            <span
+                                                className={
+                                                    cargoEspecifico.estado === 'ACTIVO'
+                                                        ? 'w3-tag w3-green'
+                                                        : 'w3-tag w3-red'
+                                                }
+                                                style={{
+                                                    fontSize: '10px'
+                                                }}
+                                            >
+
+                                                {
+                                                    cargoEspecifico.estado
+                                                }
+
+                                            </span>
+
+                                        </td>
+
+
+                                        <td
+                                            style={{
+                                                paddingTop: '6px',
+                                                paddingBottom: '6px',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+
+                                            {
+                                                formatearFecha(
+                                                    cargoEspecifico.fechaRegistro
+                                                )
+                                            }
+
+                                        </td>
+
+
+                                        <td
+                                            style={{
+                                                paddingTop: '6px',
+                                                paddingBottom: '6px',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+
+                                            {
+                                                formatearFecha(
+                                                    cargoEspecifico.fechaActualizacion
+                                                )
+                                            }
+
+                                        </td>
+
+
+                                        <td
+                                            style={{
+                                                paddingTop: '6px',
+                                                paddingBottom: '6px',
+                                                textAlign: 'center',
+                                                whiteSpace: 'nowrap'
                                             }}
                                         >
 
                                             <button
+                                                type="button"
                                                 className="w3-button w3-light-grey w3-border w3-round-small"
                                                 title="Editar"
+                                                onClick={() =>
+                                                    manejarEditar(
+                                                        cargoEspecifico
+                                                    )
+                                                }
+                                                style={{
+                                                    display: 'inline-block',
+                                                    verticalAlign: 'middle'
+                                                }}
                                             >
 
                                                 <i className="fa fa-pencil"></i>
@@ -296,26 +444,50 @@ function CargoEspecificoTable({
 
 
                                             <button
+                                                type="button"
                                                 className="w3-button w3-light-grey w3-border w3-round-small"
-                                                title="Activar / desactivar"
+                                                title={
+                                                    cargoEspecifico.estado === 'ACTIVO'
+                                                        ? 'Desactivar'
+                                                        : 'Activar'
+                                                }
+                                                onClick={() =>
+                                                    manejarEstado(
+                                                        cargoEspecifico
+                                                    )
+                                                }
+                                                disabled={
+                                                    cambiandoEstado
+                                                }
+                                                style={{
+                                                    display: 'inline-block',
+                                                    verticalAlign: 'middle',
+                                                    marginLeft: '5px'
+                                                }}
                                             >
 
-                                                <i className="fa fa-ban"></i>
+                                                <i
+                                                    className={
+                                                        cargoEspecifico.estado === 'ACTIVO'
+                                                            ? 'fa fa-ban'
+                                                            : 'fa fa-check'
+                                                    }
+                                                ></i>
 
                                             </button>
 
-                                        </div>
+                                        </td>
 
-                                    </td>
+                                    </tr>
 
-                                </tr>
+                                )
+                            )}
 
-                            )
-                        )}
+                    </tbody>
 
-                </tbody>
+                </table>
 
-            </table>
+            </div>
 
         </div>
 

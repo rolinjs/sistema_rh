@@ -1,7 +1,71 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
+import {
+    listarCargos,
+    crearCargo,
+    editarCargo,
+    cambiarEstadoCargo
+} from '../api/cargosApi'
 
 import apiClient from '../../../services/apiClient'
 
+
+// =====================================================
+// OBTENER MENSAJE DEL ERROR
+// =====================================================
+
+const obtenerMensajeError = (
+    error,
+    mensajePorDefecto
+) => {
+
+    if (error?.response?.data) {
+
+        const data =
+            error.response.data
+
+
+        if (
+            typeof data === 'string' &&
+            data.trim() !== ''
+        ) {
+
+            return data
+
+        }
+
+
+        if (data.message) {
+
+            return data.message
+
+        }
+
+
+        if (data.error) {
+
+            return data.error
+
+        }
+
+    }
+
+
+    if (error?.message) {
+
+        return error.message
+
+    }
+
+
+    return mensajePorDefecto
+
+}
+
+
+// =====================================================
+// HOOK
+// =====================================================
 
 function useCargos() {
 
@@ -22,65 +86,354 @@ function useCargos() {
 
     const [error, setError] = useState(null)
 
+    const [guardando, setGuardando] = useState(false)
+
+    const [cambiandoEstado, setCambiandoEstado] =
+        useState(false)
+
 
     // =====================================================
-    // CARGAR CARGOS Y SUBÁREAS
+    // CARGAR CARGOS
+    // =====================================================
+
+    const cargarCargos = useCallback(async () => {
+
+        try {
+
+            const respuesta =
+                await listarCargos()
+
+            setCargos(
+                Array.isArray(respuesta)
+                    ? respuesta
+                    : []
+            )
+
+        } catch (error) {
+
+            console.error(
+                'ERROR CARGANDO CARGOS:',
+                error
+            )
+
+            throw error
+
+        }
+
+    }, [])
+
+
+    // =====================================================
+    // CARGAR SUBÁREAS
+    // =====================================================
+
+    const cargarSubAreas = useCallback(async () => {
+
+        try {
+
+            const response =
+                await apiClient.get(
+                    '/subareas'
+                )
+
+            setSubAreas(
+                Array.isArray(response.data)
+                    ? response.data
+                    : []
+            )
+
+        } catch (error) {
+
+            console.error(
+                'ERROR CARGANDO SUBÁREAS:',
+                error
+            )
+
+            throw error
+
+        }
+
+    }, [])
+
+
+    // =====================================================
+    // CARGAR DATOS INICIALES
+    // =====================================================
+
+    const cargarDatos = useCallback(async () => {
+
+        setLoading(true)
+
+        setError(null)
+
+
+        try {
+
+            await Promise.all([
+                cargarCargos(),
+                cargarSubAreas()
+            ])
+
+        } catch (error) {
+
+            console.error(
+                'ERROR CARGANDO DATOS DE CARGOS:',
+                error
+            )
+
+            setError(
+                obtenerMensajeError(
+                    error,
+                    'No se pudieron cargar los cargos.'
+                )
+            )
+
+        } finally {
+
+            setLoading(false)
+
+        }
+
+    }, [
+        cargarCargos,
+        cargarSubAreas
+    ])
+
+
+    // =====================================================
+    // EJECUTAR AL CARGAR
     // =====================================================
 
     useEffect(() => {
 
-        const cargarDatos = async () => {
+        cargarDatos()
 
-            try {
-
-                setLoading(true)
-
-                setError(null)
+    }, [
+        cargarDatos
+    ])
 
 
-                const respuestaCargos =
-                    await apiClient.get('/cargos')
+    // =====================================================
+    // CREAR CARGO
+    // =====================================================
+
+    const crear = async (datos) => {
+
+        setGuardando(true)
+
+        setError(null)
 
 
-                const respuestaSubAreas =
-                    await apiClient.get('/subareas')
+        try {
+
+            const cargoCreado =
+                await crearCargo(datos)
 
 
-                setCargos(
-                    respuestaCargos.data
-                )
+            setCargos((actuales) => [
+
+                ...actuales,
+
+                cargoCreado
+
+            ])
 
 
-                setSubAreas(
-                    respuestaSubAreas.data
-                )
+            return {
 
+                ok: true,
 
-            } catch (error) {
-
-                console.error(
-                    'ERROR CARGANDO CARGOS:',
-                    error
-                )
-
-
-                setError(
-                    'No se pudieron cargar los cargos.'
-                )
-
-
-            } finally {
-
-                setLoading(false)
+                data: cargoCreado
 
             }
 
+        } catch (error) {
+
+            console.error(
+                'ERROR CREANDO CARGO:',
+                error
+            )
+
+
+            const mensaje =
+                obtenerMensajeError(
+                    error,
+                    'No se pudo registrar el cargo.'
+                )
+
+
+            setError(mensaje)
+
+
+            return {
+
+                ok: false,
+
+                error: mensaje
+
+            }
+
+        } finally {
+
+            setGuardando(false)
+
         }
 
+    }
 
-        cargarDatos()
 
-    }, [])
+    // =====================================================
+    // EDITAR CARGO
+    // =====================================================
+
+    const editar = async (
+        id,
+        datos
+    ) => {
+
+        setGuardando(true)
+
+        setError(null)
+
+
+        try {
+
+            const cargoActualizado =
+                await editarCargo(
+                    id,
+                    datos
+                )
+
+
+            setCargos((actuales) =>
+
+                actuales.map(
+                    cargo =>
+                        cargo.id === id
+                            ? cargoActualizado
+                            : cargo
+                )
+
+            )
+
+
+            return {
+
+                ok: true,
+
+                data: cargoActualizado
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                'ERROR EDITANDO CARGO:',
+                error
+            )
+
+
+            const mensaje =
+                obtenerMensajeError(
+                    error,
+                    'No se pudo actualizar el cargo.'
+                )
+
+
+            setError(mensaje)
+
+
+            return {
+
+                ok: false,
+
+                error: mensaje
+
+            }
+
+        } finally {
+
+            setGuardando(false)
+
+        }
+
+    }
+
+
+    // =====================================================
+    // CAMBIAR ESTADO
+    // =====================================================
+
+    const cambiarEstado = async (
+        id
+    ) => {
+
+        setCambiandoEstado(true)
+
+        setError(null)
+
+
+        try {
+
+            const cargoActualizado =
+                await cambiarEstadoCargo(
+                    id
+                )
+
+
+            setCargos((actuales) =>
+
+                actuales.map(
+                    cargo =>
+                        cargo.id === id
+                            ? cargoActualizado
+                            : cargo
+                )
+
+            )
+
+
+            return {
+
+                ok: true,
+
+                data: cargoActualizado
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                'ERROR CAMBIANDO ESTADO DEL CARGO:',
+                error
+            )
+
+
+            const mensaje =
+                obtenerMensajeError(
+                    error,
+                    'No se pudo cambiar el estado del cargo.'
+                )
+
+
+            setError(mensaje)
+
+
+            return {
+
+                ok: false,
+
+                error: mensaje
+
+            }
+
+        } finally {
+
+            setCambiandoEstado(false)
+
+        }
+
+    }
 
 
     // =====================================================
@@ -95,7 +448,19 @@ function useCargos() {
 
         loading,
 
-        error
+        error,
+
+        guardando,
+
+        cambiandoEstado,
+
+        cargarDatos,
+
+        crear,
+
+        editar,
+
+        cambiarEstado
 
     }
 

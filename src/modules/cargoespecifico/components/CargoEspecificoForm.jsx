@@ -10,7 +10,13 @@ function CargoEspecificoForm({
 
     guardarCargoEspecifico,
 
-    importarArchivo
+    importarArchivo,
+
+    guardando,
+
+    editando,
+
+    onCancelar
 
 }) {
 
@@ -27,11 +33,20 @@ function CargoEspecificoForm({
 
                 <h6 className="w3-margin">
 
-                    <i className="fa fa-plus-circle"></i>
+                    <i
+                        className={
+                            editando
+                                ? "fa fa-pencil"
+                                : "fa fa-plus-circle"
+                        }
+                    ></i>
 
                     &nbsp;
 
-                    Registrar cargo específico
+                    {editando
+                        ? 'Editar cargo específico'
+                        : 'Registrar cargo específico'
+                    }
 
                 </h6>
 
@@ -79,6 +94,7 @@ function CargoEspecificoForm({
                                 )
                             }
                             placeholder="Ej. Asistente de calibrado"
+                            disabled={guardando}
                         />
 
                     </div>
@@ -111,6 +127,7 @@ function CargoEspecificoForm({
                                     event.target.value
                                 )
                             }
+                            disabled={guardando}
                         >
 
                             <option value="">
@@ -161,16 +178,50 @@ function CargoEspecificoForm({
                                 backgroundColor: '#2c4053',
                                 color: '#fff'
                             }}
+                            disabled={guardando}
                         >
 
                             <i className="fa fa-save"></i>
 
                             &nbsp;
 
-                            Guardar
+                            {guardando
+                                ? 'Guardando...'
+                                : editando
+                                    ? 'Actualizar'
+                                    : 'Guardar'
+                            }
 
                         </button>
 
+
+                        {/* =================================================
+                            CANCELAR EDICIÓN
+                        ================================================= */}
+
+                        {editando && (
+
+                            <button
+                                type="button"
+                                className="w3-button w3-light-grey w3-round-small"
+                                onClick={onCancelar}
+                                disabled={guardando}
+                            >
+
+                                <i className="fa fa-times"></i>
+
+                                &nbsp;
+
+                                Cancelar
+
+                            </button>
+
+                        )}
+
+
+                        {/* =================================================
+                            IMPORTAR
+                        ================================================= */}
 
                         <label
                             htmlFor="importarCargoEspecifico"
