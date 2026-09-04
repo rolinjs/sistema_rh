@@ -1,46 +1,71 @@
-import ServerStatus from '../../../components/ui/ServerStatus'
+import ServerStatus from '../../../components/ui/ServerStatus';
 
-
-function SubAreaTable({
+const SubAreaTable = ({
     subAreasFiltradas,
     loading,
-    error
-}) {
-
-    // =====================================================
-    // FORMATEAR FECHA
-    // =====================================================
+    error,
+    onEditar,
+    onCambiarEstado,
+    cambiandoEstado
+}) => {
 
     const formatearFecha = (fecha) => {
 
         if (!fecha) {
-
-            return '—'
-
+            return '-'
         }
 
+        const fechaFormateada = new Date(fecha)
 
-        return new Date(fecha).toLocaleString(
-            'es-PE',
-            {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }
-        )
+        if (Number.isNaN(fechaFormateada.getTime())) {
+            return '-'
+        }
 
+        return fechaFormateada.toLocaleString('es-PE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
     }
 
+    const manejarEditar = (subArea) => {
+
+        console.log('Editar subárea:', subArea)
+
+        if (typeof onEditar === 'function') {
+            onEditar(subArea)
+        }
+    }
+
+    const manejarEstado = async (subArea) => {
+
+        const accion =
+            subArea.estado === 'ACTIVO'
+                ? 'desactivar'
+                : 'activar'
+
+        const confirmado = window.confirm(
+            `¿Está seguro de ${accion} la subárea "${subArea.nombre}"?`
+        )
+
+        if (!confirmado) {
+            return
+        }
+
+        console.log(
+            'Cambiar estado subárea:',
+            subArea.id
+        )
+
+        if (typeof onCambiarEstado === 'function') {
+            await onCambiarEstado(subArea)
+        }
+    }
 
     return (
-
         <div className="w3-card w3-white w3-small">
-
-            {/* =================================================
-                CABECERA
-            ================================================= */}
 
             <header className="w3-container w3-light-grey">
 
@@ -55,26 +80,18 @@ function SubAreaTable({
                 >
 
                     <h6 className="w3-margin">
-
                         <i className="fa fa-list"></i>
 
                         &nbsp;
 
-                        Lista de subáreas
-
+                        Lista de áreas
                     </h6>
 
-
-                    <ServerStatus />
+                     <ServerStatus />
 
                 </div>
 
             </header>
-
-
-            {/* =================================================
-                TABLA
-            ================================================= */}
 
             <div className="w3-responsive w3-margin-bottom">
 
@@ -83,216 +100,145 @@ function SubAreaTable({
                     <thead>
 
                         <tr>
-
-                            <th>
-                                SubÁrea
-                            </th>
-
-                            <th>
-                                Área
-                            </th>
-
-                            <th>
-                                Descripción
-                            </th>
-
-                            <th>
-                                Estado
-                            </th>
-
-                            <th>
-                                Fecha de creación
-                            </th>
-
-                            <th>
-                                Actualización
-                            </th>
-
-                            <th
-                                className="w3-center"
-                                style={{
-                                    width: '120px'
-                                }}
-                            >
-                                Acciones
-                            </th>
-
+                            <th>SubÁrea</th>
+                            <th>Área</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Fecha de creación</th>
+                            <th>Actualización</th>
+                            <th>Acciones</th>
                         </tr>
 
                     </thead>
 
-
                     <tbody>
 
-                        {loading ? (
-
+                        {loading && (
                             <tr>
-
                                 <td
                                     colSpan="7"
-                                    className="w3-center w3-text-grey"
-                                    style={{
-                                        padding: '30px'
-                                    }}
+                                    className="w3-center"
                                 >
-
-                                    <i className="fa fa-spinner fa-spin"></i>
-
-                                    &nbsp;
-
                                     Cargando subáreas...
-
                                 </td>
-
                             </tr>
+                        )}
 
-                        ) : error ? (
-
+                        {!loading && error && (
                             <tr>
-
                                 <td
                                     colSpan="7"
-                                    className="w3-center w3-pale-red"
-                                    style={{
-                                        padding: '30px'
-                                    }}
+                                    className="w3-center w3-text-red"
                                 >
-
-                                    <i className="fa fa-warning"></i>
-
-                                    &nbsp;
-
                                     {error}
-
                                 </td>
-
                             </tr>
+                        )}
 
-                        ) : subAreasFiltradas.length === 0 ? (
+                        {!loading &&
+                            !error &&
+                            subAreasFiltradas.length === 0 && (
+                                <tr>
+                                    <td
+                                        colSpan="7"
+                                        className="w3-center"
+                                    >
+                                        No se encontraron subáreas.
+                                    </td>
+                                </tr>
+                            )}
 
-                            <tr>
+                        {!loading &&
+                            !error &&
+                            subAreasFiltradas.map((subArea) => (
 
-                                <td
-                                    colSpan="7"
-                                    className="w3-center w3-text-grey"
-                                    style={{
-                                        padding: '30px'
-                                    }}
+                                <tr
+                                    key={subArea.id}
+                                    className="w3-hover-pale-green"
                                 >
 
-                                    No se encontraron subáreas.
+                                    <td>
+                                        {subArea.nombre}
+                                    </td>
 
-                                </td>
+                                    <td>
+                                        {subArea.areaNombre}
+                                    </td>
 
-                            </tr>
+                                    <td>
+                                        {subArea.descripcion || '-'}
+                                    </td>
 
-                        ) : (
+                                    <td>
 
-                            subAreasFiltradas.map(
-                                subArea => (
+                                        <span
+                                            className={
+                                                subArea.estado === 'ACTIVO'
+                                                    ? 'w3-tag w3-green w3-round'
+                                                    : 'w3-tag w3-red w3-round'
+                                            }
+                                        >
+                                            {subArea.estado}
+                                        </span>
 
-                                    <tr
-                                        key={subArea.id}
-                                        className="w3-hover-pale-green"
-                                    >
+                                    </td>
 
-                                        <td
-                                            style={{
-                                                fontWeight: 600
-                                            }}
+                                    <td>
+                                        {formatearFecha(
+                                            subArea.fechaRegistro
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        {formatearFecha(
+                                            subArea.fechaActualizacion
+                                        )}
+                                    </td>
+
+                                    <td>
+
+                                        <button
+                                            type="button"
+                                            className="w3-button w3-tiny w3-round w3-border w3-light-grey w3-margin-right"
+                                            title="Editar"
+                                            onClick={() =>
+                                                manejarEditar(subArea)
+                                            }
                                         >
 
-                                            {subArea.nombre}
+                                            <i className="fa fa-pencil"></i>
 
-                                        </td>
+                                        </button>
 
+                                        <button
+                                            type="button"
+                                            className="w3-button w3-tiny w3-round w3-border w3-light-grey"
+                                            title={
+                                                subArea.estado === 'ACTIVO'
+                                                    ? 'Desactivar'
+                                                    : 'Activar'
+                                            }
+                                            onClick={() =>
+                                                manejarEstado(subArea)
+                                            }
+                                            disabled={cambiandoEstado}
+                                        >
 
-                                        <td>
+                                            <i
+                                                className={
+                                                    subArea.estado === 'ACTIVO'
+                                                        ? 'fa fa-ban'
+                                                        : 'fa fa-check'
+                                                }
+                                            ></i>
 
-                                            {subArea.areaNombre || '—'}
+                                        </button>
 
-                                        </td>
+                                    </td>
 
+                                </tr>
 
-                                        <td>
-
-                                            {subArea.descripcion || '—'}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {subArea.estado === 'ACTIVO' ? (
-
-                                                <span className="w3-tag w3-green">
-
-                                                    Activo
-
-                                                </span>
-
-                                            ) : (
-
-                                                <span className="w3-tag w3-red">
-
-                                                    Inactivo
-
-                                                </span>
-
-                                            )}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {formatearFecha(
-                                                subArea.fechaRegistro
-                                            )}
-
-                                        </td>
-
-
-                                        <td>
-
-                                            {formatearFecha(
-                                                subArea.fechaActualizacion
-                                            )}
-
-                                        </td>
-
-
-                                        <td className="w3-center">
-
-                                            <button
-                                                type="button"
-                                                className="w3-button w3-tiny w3-round w3-border w3-light-grey w3-margin-right"
-                                                title="Editar"
-                                            >
-
-                                                <i className="fa fa-pencil"></i>
-
-                                            </button>
-
-
-                                            <button
-                                                type="button"
-                                                className="w3-button w3-tiny w3-round w3-border w3-light-grey"
-                                                title="Activar / desactivar"
-                                            >
-
-                                                <i className="fa fa-ban"></i>
-
-                                            </button>
-
-                                        </td>
-
-                                    </tr>
-
-                                )
-                            )
-
-                        )}
+                            ))}
 
                     </tbody>
 
@@ -301,9 +247,7 @@ function SubAreaTable({
             </div>
 
         </div>
-
     )
 }
-
 
 export default SubAreaTable

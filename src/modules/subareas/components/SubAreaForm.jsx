@@ -1,52 +1,60 @@
-function SubAreaForm({
+const SubAreaForm = ({
     nombre,
     setNombre,
     areaId,
     setAreaId,
     descripcion,
     setDescripcion,
-    areas
-}) {
+    areas,
+    onGuardar,
+    guardando,
+    editando,
+    onCancelar
+}) => {
+
+    const manejarSubmit = async (e) => {
+
+        e.preventDefault()
+
+        if (!nombre.trim()) {
+            window.alert('Ingrese el nombre de la subárea.')
+            return
+        }
+
+        if (!areaId) {
+            window.alert('Seleccione un área.')
+            return
+        }
+
+        const datos = {
+            nombre: nombre.trim(),
+            areaId,
+            descripcion: descripcion.trim()
+        }
+
+        await onGuardar(datos)
+    }
 
     return (
+        <div className="w3-card w3-white w3-margin-bottom">
 
-        <div className="w3-card w3-white">
-
-            {/* =================================================
-                CABECERA
-            ================================================= */}
-
-            <header className="w3-container w3-light-grey">
-
+            <div className="w3-container w3-light-grey">
                 <h4>
-
-                    <i className="fa fa-plus-circle"></i>
-
-                    &nbsp;
-
-                    Registrar subárea
-
+                    <i className={`fa ${editando ? 'fa-pencil' : 'fa-plus-circle'} w3-margin-right`}></i>
+                    {editando ? 'Editar subárea' : 'Registrar subárea'}
                 </h4>
+            </div>
 
-            </header>
-
-
-            {/* =================================================
-                FORMULARIO
-            ================================================= */}
-
-            <div className="w3-container w3-small">
+            <form
+                className="w3-container w3-small"
+                onSubmit={manejarSubmit}
+            >
 
                 <div className="w3-row-padding">
-
-                    {/* =================================================
-                        NOMBRE
-                    ================================================= */}
 
                     <div className="w3-col l4 m4 s12">
 
                         <label
-                            className="w3-text-grey"
                             style={{
                                 fontSize: '12px',
                                 fontWeight: 600
@@ -55,30 +63,21 @@ function SubAreaForm({
                             Nombre
                         </label>
 
-
                         <input
-                            className="w3-input w3-border"
                             type="text"
-                            placeholder="Ej. Recepción"
+                            className="w3-input w3-border"
                             value={nombre}
-                            onChange={(event) =>
-                                setNombre(
-                                    event.target.value
-                                )
-                            }
+                            onChange={(e) => setNombre(e.target.value)}
+                            placeholder="Ingrese nombre"
+                            maxLength={100}
+                            disabled={guardando}
                         />
 
                     </div>
 
-
-                    {/* =================================================
-                        ÁREA
-                    ================================================= */}
-
                     <div className="w3-col l4 m4 s12">
 
                         <label
-                            className="w3-text-grey"
                             style={{
                                 fontSize: '12px',
                                 fontWeight: 600
@@ -87,46 +86,33 @@ function SubAreaForm({
                             Área
                         </label>
 
-
                         <select
                             className="w3-select w3-border"
                             value={areaId}
-                            onChange={(event) =>
-                                setAreaId(
-                                    event.target.value
-                                )
-                            }
+                            onChange={(e) => setAreaId(e.target.value)}
+                            disabled={guardando}
                         >
 
                             <option value="">
-                                Seleccione
+                                Seleccione un área
                             </option>
 
-
-                            {areas.map(area => (
-
+                            {areas.map((area) => (
                                 <option
                                     key={area.id}
                                     value={area.id}
                                 >
                                     {area.nombre}
                                 </option>
-
                             ))}
 
                         </select>
 
                     </div>
 
-
-                    {/* =================================================
-                        DESCRIPCIÓN
-                    ================================================= */}
-
                     <div className="w3-col l4 m4 s12">
 
                         <label
-                            className="w3-text-grey"
                             style={{
                                 fontSize: '12px',
                                 fontWeight: 600
@@ -135,78 +121,72 @@ function SubAreaForm({
                             Descripción
                         </label>
 
-
                         <input
-                            className="w3-input w3-border"
                             type="text"
-                            placeholder="Descripción de la subárea"
+                            className="w3-input w3-border"
                             value={descripcion}
-                            onChange={(event) =>
-                                setDescripcion(
-                                    event.target.value
-                                )
-                            }
+                            onChange={(e) => setDescripcion(e.target.value)}
+                            placeholder="Ingrese descripción"
+                            maxLength={255}
+                            disabled={guardando}
                         />
 
                     </div>
 
                 </div>
 
+                <div className="w3-margin-top w3-margin-bottom">
 
-                {/* =================================================
-                    BOTONES
-                ================================================= */}
+                    <button
+                        type="submit"
+                        className="w3-button w3-round w3-small"
+                        style={{
+                            backgroundColor: '#2c4056',
+                            color: 'white'
+                        }}
+                        disabled={guardando}
+                    >
 
-                <div
-                    className="w3-row-padding w3-margin-bottom"
-                    style={{
-                        marginTop: '15px'
-                    }}
-                >
+                        <i className="fa fa-save w3-margin-right"></i>
 
-                    <div className="w3-col s12">
+                        {guardando
+                            ? 'Guardando...'
+                            : editando
+                                ? 'Actualizar'
+                                : 'Guardar'
+                        }
 
+                    </button>
+
+                    {editando && (
                         <button
                             type="button"
-                            className="w3-button"
-                            style={{
-                                backgroundColor: '#2c4056',
-                                color: '#ffffff'
-                            }}
+                            className="w3-button w3-round w3-small w3-light-grey w3-border w3-margin-left"
+                            onClick={onCancelar}
+                            disabled={guardando}
                         >
-
-                            <i className="fa fa-save"></i>
-
-                            &nbsp;
-
-                            Guardar
-
+                            <i className="fa fa-times w3-margin-right"></i>
+                            Cancelar
                         </button>
+                    )}
 
-
+                    {!editando && (
                         <button
                             type="button"
-                            className="w3-button w3-light-grey w3-margin-left"
+                            className="w3-button w3-small w3-light-grey w3-border w3-margin-left"
+                            onClick={() => window.alert('Función de importación pendiente.')}
                         >
-
-                            <i className="fa fa-file-excel-o"></i>
-
-                            &nbsp;
-
+                            <i className="fa fa-upload w3-margin-right"></i>
                             Importar
-
                         </button>
-
-                    </div>
+                    )}
 
                 </div>
 
-            </div>
+            </form>
 
         </div>
-
     )
 }
-
 
 export default SubAreaForm
