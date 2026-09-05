@@ -16,7 +16,7 @@ function Sidebar({
 
 
     // =====================================================
-    // ABRIR / CERRAR SUBMENÚ
+    // ABRIR / CERRAR MENÚ
     // =====================================================
 
     const toggleMenu = (menuId) => {
@@ -30,16 +30,528 @@ function Sidebar({
 
 
     // =====================================================
-    // CLASE PARA OPCIÓN ACTIVA
+    // CLASE ENLACE
     // =====================================================
 
     const getLinkClass = ({ isActive }) => {
 
-        return `w3-bar-item w3-button w3-padding ${
+        return `w3-button ${
             isActive
                 ? 'w3-green'
                 : ''
         }`
+
+    }
+
+
+    // =====================================================
+    // ENLACE FINAL
+    // =====================================================
+
+    const renderLink = (
+        item,
+        level = 0
+    ) => {
+
+        const isNested =
+            level >= 2
+
+
+        return (
+
+            <NavLink
+                key={item.id}
+                to={item.path}
+                className={getLinkClass}
+                title={
+                    isCollapsed
+                        ? item.label
+                        : ''
+                }
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+
+                    width: '100%',
+                    boxSizing: 'border-box',
+
+                    minHeight: '38px',
+
+                    paddingTop: '7px',
+                    paddingBottom: '7px',
+
+                    paddingLeft: isCollapsed
+                        ? '0'
+                        : '14px',
+
+                    paddingRight: '10px',
+
+                    textDecoration: 'none',
+
+                    textAlign: isCollapsed
+                        ? 'center'
+                        : 'left',
+
+                    whiteSpace: 'nowrap',
+
+                    justifyContent: isCollapsed
+                        ? 'center'
+                        : 'flex-start',
+
+                    fontSize: '14px',
+
+                    borderRadius:
+                        isCollapsed
+                            ? '0'
+                            : '4px',
+
+                    margin:
+                        isCollapsed
+                            ? '0'
+                            : '1px 8px 1px 8px',
+
+                    width:
+                        isCollapsed
+                            ? '100%'
+                            : 'calc(100% - 16px)',
+
+                    borderLeft:
+                        !isCollapsed && isNested
+                            ? '2px solid #d8d8d8'
+                            : '2px solid transparent'
+                }}
+            >
+
+                <i
+                    className={`fa ${item.icon} fa-fw`}
+                    style={{
+                        width: '22px',
+                        minWidth: '22px',
+                        textAlign: 'center'
+                    }}
+                ></i>
+
+
+                {!isCollapsed && (
+
+                    <span
+                        style={{
+                            marginLeft: '4px'
+                        }}
+                    >
+                        {item.label}
+                    </span>
+
+                )}
+
+            </NavLink>
+
+        )
+
+    }
+
+
+    // =====================================================
+    // MENÚ INTERNO
+    // =====================================================
+
+    const renderSubMenu = (
+        menu,
+        level = 1
+    ) => {
+
+        const isOpenMenu =
+            openMenus[menu.id] === true
+
+
+        return (
+
+            <div
+                key={menu.id}
+                style={{
+                    marginTop: '3px',
+                    marginBottom: '3px'
+                }}
+            >
+
+                {/* =================================================
+                    CATEGORÍA INTERNA
+                ================================================= */}
+
+                <button
+                    type="button"
+                    onClick={() =>
+                        toggleMenu(menu.id)
+                    }
+                    title={
+                        isCollapsed
+                            ? menu.label
+                            : ''
+                    }
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+
+                        width: '100%',
+                        boxSizing: 'border-box',
+
+                        minHeight: '40px',
+
+                        padding:
+                            isCollapsed
+                                ? '8px 0'
+                                : '8px 12px',
+
+                        paddingLeft:
+                            isCollapsed
+                                ? '0'
+                                : '28px',
+
+                        border: 'none',
+
+                        background:
+                            isOpenMenu && !isCollapsed
+                                ? '#eeeeee'
+                                : 'transparent',
+
+                        color: '#333',
+
+                        cursor: 'pointer',
+
+                        textAlign:
+                            isCollapsed
+                                ? 'center'
+                                : 'left',
+
+                        justifyContent:
+                            isCollapsed
+                                ? 'center'
+                                : 'flex-start',
+
+                        fontSize: '13px',
+
+                        fontWeight: 600,
+
+                        borderRadius:
+                            isCollapsed
+                                ? '0'
+                                : '4px',
+
+                        margin:
+                            isCollapsed
+                                ? '0'
+                                : '0 8px',
+
+                        width:
+                            isCollapsed
+                                ? '100%'
+                                : 'calc(100% - 16px)'
+                    }}
+                >
+
+                    <i
+                        className={`fa ${menu.icon} fa-fw`}
+                        style={{
+                            width: '22px',
+                            minWidth: '22px',
+                            textAlign: 'center'
+                        }}
+                    ></i>
+
+
+                    {!isCollapsed && (
+
+                        <span
+                            style={{
+                                marginLeft: '4px',
+                                flex: 1
+                            }}
+                        >
+                            {menu.label}
+                        </span>
+
+                    )}
+
+
+                    {!isCollapsed && (
+
+                        <i
+                            className={`fa ${
+                                isOpenMenu
+                                    ? 'fa-chevron-up'
+                                    : 'fa-chevron-down'
+                            }`}
+                            style={{
+                                fontSize: '11px',
+                                marginLeft: '8px'
+                            }}
+                        ></i>
+
+                    )}
+
+                </button>
+
+
+                {/* =================================================
+                    ELEMENTOS INTERNOS
+                ================================================= */}
+
+                {!isCollapsed && isOpenMenu && (
+
+                    <div
+                        style={{
+                            marginLeft: '35px',
+                            marginRight: '8px',
+
+                            borderLeft:
+                                '1px solid #d9d9d9',
+
+                            paddingTop: '3px',
+                            paddingBottom: '3px'
+                        }}
+                    >
+
+                        {(menu.children || []).map(child => {
+
+                            if (child.children) {
+
+                                return renderSubMenu(
+                                    child,
+                                    level + 1
+                                )
+
+                            }
+
+
+                            return renderLink(
+                                child,
+                                level + 1
+                            )
+
+                        })}
+
+                    </div>
+
+                )}
+
+            </div>
+
+        )
+
+    }
+
+
+    // =====================================================
+    // MÓDULO PRINCIPAL
+    // =====================================================
+
+    const renderModule = (menu) => {
+
+        const isOpenModule =
+            openMenus[menu.id] === true
+
+
+        return (
+
+            <div
+                key={menu.id}
+                style={{
+                    marginBottom:
+                        isCollapsed
+                            ? '4px'
+                            : '10px'
+                }}
+            >
+
+                {/* =================================================
+                    CABECERA DEL MÓDULO
+                ================================================= */}
+
+                <button
+                    type="button"
+                    onClick={() =>
+                        toggleMenu(menu.id)
+                    }
+                    title={
+                        isCollapsed
+                            ? menu.label
+                            : ''
+                    }
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+
+                        width: '100%',
+                        boxSizing: 'border-box',
+
+                        minHeight:
+                            isCollapsed
+                                ? '48px'
+                                : '54px',
+
+                        padding:
+                            isCollapsed
+                                ? '8px 0'
+                                : '7px 10px',
+
+                        border:
+                            isCollapsed
+                                ? 'none'
+                                : '1px solid #dedede',
+
+                        borderRadius:
+                            isCollapsed
+                                ? '0'
+                                : '6px',
+
+                        background:
+                            isOpenModule && !isCollapsed
+                                ? '#e9ecef'
+                                : '#f4f4f4',
+
+                        color: '#263746',
+
+                        cursor: 'pointer',
+
+                        textAlign:
+                            isCollapsed
+                                ? 'center'
+                                : 'left',
+
+                        justifyContent:
+                            isCollapsed
+                                ? 'center'
+                                : 'flex-start',
+
+                        boxShadow:
+                            isCollapsed
+                                ? 'none'
+                                : '0 1px 2px rgba(0,0,0,0.04)',
+
+                        fontSize: '14px',
+
+                        fontWeight: 700
+                    }}
+                >
+
+                    {/* =================================================
+                        ICONO DEL MÓDULO
+                    ================================================= */}
+
+                    <span
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+
+                            width:
+                                isCollapsed
+                                    ? '100%'
+                                    : '34px',
+
+                            minWidth:
+                                isCollapsed
+                                    ? '100%'
+                                    : '34px',
+
+                            height: '34px',
+
+                            background:
+                                isCollapsed
+                                    ? 'transparent'
+                                    : '#ffffff',
+
+                            borderRadius:
+                                isCollapsed
+                                    ? '0'
+                                    : '5px',
+
+                            border:
+                                isCollapsed
+                                    ? 'none'
+                                    : '1px solid #dddddd'
+                        }}
+                    >
+
+                        <i
+                            className={`fa ${menu.icon}`}
+                        ></i>
+
+                    </span>
+
+
+                    {!isCollapsed && (
+
+                        <>
+
+                            <span
+                                style={{
+                                    marginLeft: '10px',
+                                    flex: 1,
+                                    textAlign: 'left'
+                                }}
+                            >
+                                {menu.label}
+                            </span>
+
+
+                            <i
+                                className={`fa ${
+                                    isOpenModule
+                                        ? 'fa-chevron-up'
+                                        : 'fa-chevron-down'
+                                }`}
+                                style={{
+                                    fontSize: '11px'
+                                }}
+                            ></i>
+
+                        </>
+
+                    )}
+
+                </button>
+
+
+                {/* =================================================
+                    CONTENIDO DEL MÓDULO
+                ================================================= */}
+
+                {!isCollapsed && isOpenModule && (
+
+                    <div
+                        style={{
+                            marginTop: '6px',
+                            paddingBottom: '2px'
+                        }}
+                    >
+
+                        {(menu.children || []).map(child => {
+
+                            if (child.children) {
+
+                                return renderSubMenu(
+                                    child,
+                                    1
+                                )
+
+                            }
+
+
+                            return renderLink(
+                                child,
+                                1
+                            )
+
+                        })}
+
+                    </div>
+
+                )}
+
+            </div>
+
+        )
 
     }
 
@@ -54,10 +566,15 @@ function Sidebar({
             }`}
             style={{
                 zIndex: 3,
-                width: isCollapsed
-                    ? '70px'
-                    : '300px',
-                transition: 'width 0.3s ease',
+
+                width:
+                    isCollapsed
+                        ? '70px'
+                        : '300px',
+
+                transition:
+                    'width 0.3s ease',
+
                 overflowX: 'hidden'
             }}
             id="mySidebar"
@@ -75,12 +592,15 @@ function Sidebar({
                 <div
                     className="w3-col s4"
                     style={{
-                        width: isCollapsed
-                            ? '100%'
-                            : '33.33333%',
-                        textAlign: isCollapsed
-                            ? 'center'
-                            : 'left'
+                        width:
+                            isCollapsed
+                                ? '100%'
+                                : '33.33333%',
+
+                        textAlign:
+                            isCollapsed
+                                ? 'center'
+                                : 'left'
                     }}
                 >
 
@@ -98,7 +618,9 @@ function Sidebar({
 
                 {!isCollapsed && (
 
-                    <div className="w3-col s8 w3-bar">
+                    <div
+                        className="w3-col s8 w3-bar"
+                    >
 
                         <span>
                             Bienvenido, <strong>Usuario</strong>
@@ -147,9 +669,10 @@ function Sidebar({
             <div
                 className="w3-container"
                 style={{
-                    textAlign: isCollapsed
-                        ? 'center'
-                        : 'right'
+                    textAlign:
+                        isCollapsed
+                            ? 'center'
+                            : 'right'
                 }}
             >
 
@@ -222,149 +745,37 @@ function Sidebar({
 
 
                 {/* =================================================
-                    MENÚ PRINCIPAL
+                    DASHBOARD
                 ================================================= */}
 
-                {menuConfig.map(menu => {
+                {menuConfig
+                    .filter(menu => menu.id === 'dashboard')
+                    .map(menu =>
+                        renderLink(menu, 0)
+                    )
+                }
 
 
-                    // =============================================
-                    // OPCIÓN SIN SUBMENÚ
-                    // =============================================
+                {/* =================================================
+                    MÓDULOS ERP
+                ================================================= */}
 
-                    if (!menu.children) {
+                <div
+                    style={{
+                        marginTop: '8px'
+                    }}
+                >
 
-                        return (
-
-                            <NavLink
-                                key={menu.id}
-                                to={menu.path}
-                                className={getLinkClass}
-                                title={
-                                    isCollapsed
-                                        ? menu.label
-                                        : ''
-                                }
-                                style={{
-                                    textAlign: isCollapsed
-                                        ? 'center'
-                                        : 'left',
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
-
-                                <i
-                                    className={`fa ${menu.icon} fa-fw`}
-                                ></i>
-
-                                {!isCollapsed && menu.label}
-
-                            </NavLink>
-
+                    {menuConfig
+                        .filter(menu =>
+                            menu.id !== 'dashboard'
                         )
-
+                        .map(menu =>
+                            renderModule(menu)
+                        )
                     }
 
-
-                    // =============================================
-                    // OPCIÓN CON SUBMENÚ
-                    // =============================================
-
-                    const isOpenMenu =
-                        openMenus[menu.id] === true
-
-
-                    return (
-
-                        <div key={menu.id}>
-
-
-                            {/* MENÚ PADRE */}
-
-                            <button
-                                type="button"
-                                className="w3-bar-item w3-button w3-padding rrhh-menu"
-                                onClick={() => {
-
-                                    toggleMenu(menu.id)
-
-                                }}
-                                title={
-                                    isCollapsed
-                                        ? menu.label
-                                        : ''
-                                }
-                                style={{
-                                    width: '100%',
-                                    textAlign: isCollapsed
-                                        ? 'center'
-                                        : 'left',
-                                    border: 'none',
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
-
-                                <i
-                                    className={`fa ${menu.icon} fa-fw`}
-                                ></i>
-
-                                {!isCollapsed && menu.label}
-
-
-                                {!isCollapsed && (
-
-                                    <i
-                                        className={`fa w3-right menu-arrow ${
-                                            isOpenMenu
-                                                ? 'fa-chevron-up'
-                                                : 'fa-chevron-down'
-                                        }`}
-                                    ></i>
-
-                                )}
-
-                            </button>
-
-
-                            {/* SUBMENÚ */}
-
-                            {!isCollapsed && (
-
-                                <div
-                                    className={`rrhh-submenu ${
-                                        isOpenMenu
-                                            ? 'w3-show'
-                                            : 'w3-hide'
-                                    }`}
-                                >
-
-                                    {menu.children.map(child => (
-
-                                        <NavLink
-                                            key={child.id}
-                                            to={child.path}
-                                            className={getLinkClass}
-                                        >
-
-                                            <i
-                                                className={`fa ${child.icon} fa-fw`}
-                                            ></i>
-
-                                            {child.label}
-
-                                        </NavLink>
-
-                                    ))}
-
-                                </div>
-
-                            )}
-
-                        </div>
-
-                    )
-
-                })}
+                </div>
 
 
                 <br />
